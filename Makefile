@@ -2,7 +2,7 @@ GLAD_C=/usr/src/glad.c
 
 INCLUDES=-I./ -I./include
 SOURCES=$(shell find -name "*.cpp")
-OBJ=$(patsubst ./%.cpp, obj/%.o, $(SOURCES))
+OBJ=$(patsubst ._%.cpp, obj/%.o, $(subst /,_,$(SOURCES)))
 DEBUG_OBJ=$(OBJ:obj/%=debug/%)
 DEPENDENCIES=$(OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
 OPTI=-O2
@@ -30,11 +30,13 @@ clean:
 .PHONY: run valgrind clean
 
 
-obj/%.o: %.cpp
-	@g++ -Wall -c $< $(INCLUDES) $(OPTI) -o $@ -MMD -MP -MF obj/$*.d
+.SECONDEXPANSION:
 
-debug/%.o: %.cpp
-	@g++ -Wall -c $< $(INCLUDES) -g -o $@ -MMD -MP -MF debug/$*.d
+$(OBJ): $$(patsubst obj/%.o,%.cpp,$$(subst _,/,$$@))
+	@g++ -Wall -c $< $(INCLUDES) $(OPTI) -o $@ -MMD -MP -MF $(@:.o=.d)
+
+$(DEBUG_OBJ): $$(patsubst debug/%.o,%.cpp,$$(subst _,/,$$@))
+	@g++ -Wall -c $< $(INCLUDES) -g -o $@ -MMD -MP -MF $(@:.o=.d)
 
 obj/glad.o: $(GLAD_C)
 	@gcc -c $< $(OPTI) -o $@
