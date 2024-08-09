@@ -37,7 +37,7 @@ public:
      * @param xOrientation Initial orientation around the x axis (in radians)
      * @param yOrientation Initial orientation around the y axis (in radians)
     **/
-    Camera(int width, int height, float fov = 60, float nearClip = 0.1, float farClip = 1000, vec3 position = vec3(0, 0, 0), float xOrientation = 0, float yOrientation = 0);
+    Camera(int width, int height, float fov = 60, float nearClip = 0.1, float farClip = 1500, vec3 position = vec3(0, 0, 0), float xOrientation = 0, float yOrientation = 0);
 
     /**
      * @brief Update matrix and planes based on position and orientation (must be called after changing position or orientation)

@@ -60,7 +60,7 @@ void main() {
     // Position
     vec3 pos = cubePos;
     float interleaving = distance(position, cubePos) * quadsInterleaving * 0.001f;
-    pos[1u & ~normalAxis] += -interleaving + ((gl_VertexID & 1) ^ uint(normalAxis != 0) ^ (normalID & 1u)) * (width + 2 * interleaving);
+    pos[1u & ~normalAxis] += -interleaving + ((uint(gl_VertexID) & 1u) ^ uint(normalAxis != 0) ^ (normalID & 1u)) * (width + 2 * interleaving);
     pos[2u & ~normalAxis] += -interleaving + (gl_VertexID >> 1) * (height + 2 * interleaving);
     vec3 normal = vec3(0, 0, 0);
     normal[normalAxis] = -2 * float(normalID & 1u) - 1;

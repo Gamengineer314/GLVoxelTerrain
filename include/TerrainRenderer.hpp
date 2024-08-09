@@ -14,7 +14,7 @@ using namespace std;
 // Number of threads in a group for the compute shader
 #define THREAD_GROUP_SIZE 64
 // Remove small (1 pixel) gaps between triangles
-#define QUADS_INTERLEAVING 0.0f
+#define QUADS_INTERLEAVING 0.05f
 
 
 class TerrainRenderer {
