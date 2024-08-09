@@ -1,23 +1,41 @@
-INCLUDES=-I./ -I./include
-HEADERS=$(shell find include -name "*.hpp")
-SOURCES=main.cpp $(shell find src -name "*.cpp")
-SHADERS=$(shell find shaders -name "*.glsl")
 GLAD_C=/usr/src/glad.c
 
-bin/VoxelTerrain: $(HEADERS) $(SOURCES) $(SHADERS)
-	@echo "Building program..."
-	@g++ -Wall $(GLAD_C) $(SOURCES) $(INCLUDES) -O2 -o $@ -lglfw
-	@echo "Copying shaders..."
+INCLUDES=-I./ -I./include
+SOURCES=$(shell find -name "*.cpp")
+OBJ=$(patsubst ./%.cpp, obj/%.o, $(SOURCES))
+DEBUG_OBJ=$(OBJ:obj/%=debug/%)
+DEPENDENCIES=$(OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
+
+
+bin/VoxelTerrain: $(OBJ) obj/glad.o
+	@g++ -Wall $^ -O2 -o $@ -lglfw
 	@cp shaders/* bin/shaders
 
-debug: $(HEADERS) $(SOURCES) $(SHADERS)
-	@echo "Building program in debug mode..."
-	@g++ -Wall $(GLAD_C) $(SOURCES) $(INCLUDES) -g -o $@ -lglfw
+debug/VoxelTerrain: $(DEBUG_OBJ) obj/glad.o
+	@g++ -Wall $^ -g -o $@ -lglfw
 
 run: bin/VoxelTerrain
-	@echo "Running program..."
 	@./bin/VoxelTerrain
 
-valgrind: debug
-	@echo "Running program with Valgrind..."
+valgrind: debug/VoxelTerrain
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./debug
+
+clean:
+	@find . -type f -name '*.o' -delete
+	@find . -type f -name '*.d' -delete
+	@rm -f bin/VoxelTerrain debug/VoxelTerrain
+	@rm -f bin/shaders/*.glsl
+
+.PHONY: run valgrind clean
+
+
+obj/%.o: %.cpp
+	@g++ -Wall -c $< $(INCLUDES) -O2 -o $@ -MMD -MP -MF obj/$*.d
+
+debug/%.o: %.cpp
+	@g++ -Wall -c $< $(INCLUDES) -g -o $@ -MMD -MP -MF debug/$*.d
+
+obj/glad.o: $(GLAD_C)
+	@gcc -c $< -O2 -o $@
+
+include $(wildcard $(DEPENDENCIES))

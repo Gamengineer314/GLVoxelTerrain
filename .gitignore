@@ -1,3 +1,4 @@
 .vscode/*
 bin/*
-debug
+obj/*
+debug/*
