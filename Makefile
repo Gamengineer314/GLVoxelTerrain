@@ -21,8 +21,3 @@ run: bin/VoxelTerrain
 valgrind: debug
 	@echo "Running program with Valgrind..."
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./debug
-
-clean:
-	@echo "Cleaning executables..."
-	@rm -rf bin/*
-	@rm -f debug

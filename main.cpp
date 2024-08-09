@@ -1,4 +1,5 @@
 #include <cstdint>
+#include <cstdio>
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -18,6 +19,8 @@
 #include "GenerateTerrain.hpp"
 #include "GenerateMesh.hpp"
 #include "Constants.hpp"
+#include "TerminalRenderer.hpp"
+#include "FPSCounter.hpp"
 
 using namespace std;
 using namespace this_thread;
@@ -49,6 +52,8 @@ int main() {
     TerrainRenderer renderer = TerrainRenderer(camera);
     renderer.addMeshes(meshes, squares);
     renderer.prepareRender();
+    TerminalRenderer terminal = TerminalRenderer(stdout);
+    FPSCounter fpsCounter = FPSCounter(terminal);
     
     // Main loop
     system_clock::time_point lastTime = system_clock::now();
@@ -62,9 +67,9 @@ int main() {
         controller.update(deltaTime);
         renderBackground(0, 0.8, 1.0);
         renderer.render();
+        fpsCounter.update(deltaTime);
+        terminal.render();
         window.update();
-        
-        sleep_for(20ms);
     }
 
     renderer.dispose();
