@@ -7,7 +7,7 @@
 
 #include "VoxelMesh.hpp"
 #include "Constants.hpp"
-#include <iostream>
+
 using namespace std;
 using namespace glm;
 
@@ -171,7 +171,7 @@ void generateXZSides(uint32_t xzIndex, bool after, int startIndex, int startY, i
 // Generate filled side row at (x, z)
 void generateXZSides(bool after, int startIndex, bvec2* sides) {
     for (int y = 0; y < CHUNK_SIZE; y++) {
-        sides[startIndex + y * CHUNK_SIZE] = bvec2(after ? sides[startIndex + y * CHUNK_SIZE].x : true, after ? true : sides[startIndex + y * CHUNK_SIZE].y);
+        sides[startIndex + y] = bvec2(after ? sides[startIndex + y].x : true, after ? true : sides[startIndex + y].y);
     }
 }
 
