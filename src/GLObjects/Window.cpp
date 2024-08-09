@@ -6,7 +6,7 @@
 using namespace std;
 
 
-Window::Window(int width, int height, const char* title) :
+Window::Window(int width, int height, const char* title, bool vsync) :
     width(width),
     height(height), 
     lastCursorX(width / 2),
@@ -22,6 +22,7 @@ Window::Window(int width, int height, const char* title) :
     window = glfwCreateWindow(width, height, "Voxel terrain", nullptr, nullptr);
     if (window == nullptr) throw runtime_error("glfwCreateWindow error");
     glfwMakeContextCurrent(window);
+    if (!vsync) glfwSwapInterval(0);
 }
 
 

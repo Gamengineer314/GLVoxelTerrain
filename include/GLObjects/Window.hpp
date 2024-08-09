@@ -16,8 +16,9 @@ public:
      * @param width Window width (in pixels)
      * @param height Window height (in pixels)
      * @param title Window title
+     * @param vsync Enable VSync
     **/
-    Window(int width, int height, const char* title);
+    Window(int width, int height, const char* title, bool vsync = false);
 
     /**
      * @brief Window update (must be called each frame)
