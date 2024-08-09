@@ -27,21 +27,6 @@ char* readAllText(const char* path) {
 }
 
 
-void printCompileError(GLuint shader, const char* name) {
-    GLint isCompiled = 0;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &isCompiled);
-    if (isCompiled == GL_FALSE) {
-        GLint length = 0;
-        glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &length);
-        char* log = new char[length];
-        glGetShaderInfoLog(shader, length, &length, log);
-        cout << "Shader compile error when compiling " << name << " : \n" << log;
-        delete[] log;
-        return;
-    }
-}
-
-
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath) :
     program(glCreateProgram()) {
@@ -51,7 +36,6 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) :
     glShaderSource(vertexShader, 1, &vertexCode, nullptr);
     delete[] vertexCode;
     glCompileShader(vertexShader);
-    printCompileError(vertexShader, vertexPath);
     glAttachShader(program, vertexShader);
     glDeleteShader(vertexShader);
 
@@ -60,7 +44,6 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) :
     glShaderSource(fragmentShader, 1, &fragmentCode, nullptr);
     delete[] fragmentCode;
     glCompileShader(fragmentShader);
-    printCompileError(fragmentShader, fragmentPath);
     glAttachShader(program, fragmentShader);
     glDeleteShader(fragmentShader);
 

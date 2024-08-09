@@ -6,13 +6,17 @@
 #include "GLObjects/Buffer.hpp"
 #include "GLObjects/VertexArray.hpp"
 #include "GLObjects/Shader.hpp"
+#include "GLObjects/Log.hpp"
 
 using namespace std;
+
 
 
 void renderInit(int width, int height) {
     if (gladLoadGL() == 0) throw runtime_error("gladLoadGLLoader error");
     glViewport(0, 0, width, height);
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(glCallback, 0);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
     glEnable(GL_DEPTH_TEST);
