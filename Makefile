@@ -5,17 +5,18 @@ SOURCES=$(shell find -name "*.cpp")
 OBJ=$(patsubst ./%.cpp, obj/%.o, $(SOURCES))
 DEBUG_OBJ=$(OBJ:obj/%=debug/%)
 DEPENDENCIES=$(OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
+OPTI=-O2
 
 
 bin/VoxelTerrain: $(OBJ) obj/glad.o
-	@g++ -Wall $^ -O2 -o $@ -lglfw
+	@g++ -Wall $^ $(OPTI) -o $@ -lglfw
 	@cp shaders/* bin/shaders
 
 debug/VoxelTerrain: $(DEBUG_OBJ) obj/glad.o
 	@g++ -Wall $^ -g -o $@ -lglfw
 
 run: bin/VoxelTerrain
-	@./bin/VoxelTerrain
+	@$<
 
 valgrind: debug/VoxelTerrain
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./debug
@@ -30,12 +31,12 @@ clean:
 
 
 obj/%.o: %.cpp
-	@g++ -Wall -c $< $(INCLUDES) -O2 -o $@ -MMD -MP -MF obj/$*.d
+	@g++ -Wall -c $< $(INCLUDES) $(OPTI) -o $@ -MMD -MP -MF obj/$*.d
 
 debug/%.o: %.cpp
 	@g++ -Wall -c $< $(INCLUDES) -g -o $@ -MMD -MP -MF debug/$*.d
 
 obj/glad.o: $(GLAD_C)
-	@gcc -c $< -O2 -o $@
+	@gcc -c $< $(OPTI) -o $@
 
 include $(wildcard $(DEPENDENCIES))
