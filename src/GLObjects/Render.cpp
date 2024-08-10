@@ -16,6 +16,7 @@ void renderInit(int width, int height) {
     if (gladLoadGL() == 0) throw runtime_error("gladLoadGLLoader error");
     glViewport(0, 0, width, height);
     glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glDebugMessageCallback(glCallback, 0);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
