@@ -2,7 +2,7 @@ GLAD_C=/usr/src/glad.c
 
 INCLUDES=-I./ -I./include
 SOURCES=$(shell find -name "*.cpp")
-OBJ=$(patsubst ._%.cpp, obj/%.o, $(subst /,_,$(SOURCES)))
+OBJ=$(patsubst ..%.cpp,obj/%.o,$(subst /,.,$(SOURCES)))
 DEBUG_OBJ=$(OBJ:obj/%=debug/%)
 DEPENDENCIES=$(OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
 OPTI=-O2
@@ -32,10 +32,10 @@ clean:
 
 .SECONDEXPANSION:
 
-$(OBJ): $$(patsubst obj/%.o,%.cpp,$$(subst _,/,$$@))
+$(OBJ): $$(patsubst obj/%/o,%.cpp,$$(subst .,/,$$@))
 	@g++ -Wall -c $< $(INCLUDES) $(OPTI) -o $@ -MMD -MP -MF $(@:.o=.d)
 
-$(DEBUG_OBJ): $$(patsubst debug/%.o,%.cpp,$$(subst _,/,$$@))
+$(DEBUG_OBJ): $$(patsubst debug/%/o,%.cpp,$$(subst .,/,$$@))
 	@g++ -Wall -c $< $(INCLUDES) -g -o $@ -MMD -MP -MF $(@:.o=.d)
 
 obj/glad.o: $(GLAD_C)
