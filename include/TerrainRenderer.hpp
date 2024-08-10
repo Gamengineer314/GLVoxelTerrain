@@ -55,8 +55,8 @@ private:
     Shader shader;
     vector<MeshData> meshData; // All meshes information (position, size, rectangles indices)
     vector<Square> squares; // All rectangles (position, width, height, normal)
-    StorageBuffer squaresBuffers[2]; // 0: squares, 1: squares indices
-    IndicesBuffer indicesBuffer;
+    StorageBuffer squaresBuffer;
+    InstancesBuffer squaresIndicesBuffer;
     CommandsBuffer commandBuffer;
     VertexArray vertexArray;
     Shader::Uniform positionUniform;

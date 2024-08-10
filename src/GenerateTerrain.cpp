@@ -23,7 +23,7 @@ void generateTerrain(int*& IDs, uint32_t*& IDIndexes) {
     generateHeightMap(heightMap, ids);
 
     vector<int> IDsVec = vector<int>(); 
-    IDIndexes = new uint32_t[HORIZONTAL_SIZE * HORIZONTAL_SIZE];
+    IDIndexes = new uint32_t[HORIZONTAL_SIZE * HORIZONTAL_SIZE + 1];
     generateIDs(heightMap, ids, IDsVec, IDIndexes);
 
     delete[] heightMap;

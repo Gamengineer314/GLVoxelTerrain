@@ -32,6 +32,7 @@ enum class UniqueBufferUsage : GLbitfield {
 
 enum class BufferTarget : GLenum {
     vertices = GL_ARRAY_BUFFER,
+    instances = GL_ARRAY_BUFFER,
     indices = GL_ELEMENT_ARRAY_BUFFER,
     storage = GL_SHADER_STORAGE_BUFFER,
     uniform = GL_UNIFORM_BUFFER,
@@ -127,6 +128,15 @@ class VerticesBuffer : public Buffer {
 
 public:
     VerticesBuffer() : Buffer(BufferTarget::vertices) {}
+
+};
+
+
+
+class InstancesBuffer : public Buffer {
+
+public:
+    InstancesBuffer() : Buffer(BufferTarget::instances) {}
 
 };
 

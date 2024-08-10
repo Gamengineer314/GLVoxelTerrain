@@ -39,7 +39,7 @@ const vec4 colors[5] = {
 
 
 layout(binding = 0, std430) readonly restrict buffer squaresBuffer { Square squares[]; };
-layout(binding = 1, std430) readonly restrict buffer squaresIndicesBuffer { uint squaresIndices[]; };
+layout(location = 0) in uint squareIndex;
 
 uniform mat4 vpMatrix;
 uniform vec3 position;
@@ -48,7 +48,7 @@ uniform float quadsInterleaving; // Size increase to remove small (1 pixel) gaps
 
 void main() {
     // Get square
-    Square square = squares[squaresIndices[gl_InstanceID]];
+    Square square = squares[squareIndex];
 
     // Unpack data
     vec3 cubePos = vec3(square.data1 & mask13Bits, square.data2 & mask9Bits, square.data1 >> 13);

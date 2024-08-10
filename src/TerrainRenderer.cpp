@@ -15,8 +15,8 @@ TerrainRenderer::TerrainRenderer(Camera& camera)
     shader(Shader("shaders/vertex.glsl", "shaders/fragment.glsl")),
     meshData(vector<MeshData>()),
     squares(vector<Square>()),
-    squaresBuffers { StorageBuffer(0), StorageBuffer(1) },
-    indicesBuffer(IndicesBuffer()),
+    squaresBuffer(StorageBuffer(0)),
+    squaresIndicesBuffer(InstancesBuffer()),
     commandBuffer(CommandsBuffer(sizeof(IndirectDrawArgs))),
     vertexArray(VertexArray()),
     positionUniform(shader.getUniform("position")),
@@ -43,12 +43,13 @@ void TerrainRenderer::prepareRender() {
     threadGroups = meshData.size() / THREAD_GROUP_SIZE;
 
     // Create buffers
-    squaresBuffers[0].setDataUnique(squares.data(), squares.size() * sizeof(Square), UniqueBufferUsage::none);
+    squaresBuffer.setDataUnique(squares.data(), squares.size() * sizeof(Square), UniqueBufferUsage::none);
 
     uint32_t* _squaresIndices = new uint32_t[squares.size()];
     for (uint32_t i = 0; i < squares.size(); i++) _squaresIndices[i] = i;
-    squaresBuffers[1].setDataUnique(_squaresIndices, squares.size() * sizeof(uint32_t), UniqueBufferUsage::none);
+    squaresIndicesBuffer.setDataUnique(_squaresIndices, squares.size() * sizeof(uint32_t), UniqueBufferUsage::none);
     delete[] _squaresIndices;
+    vertexArray.setInstancesInt(0, squaresIndicesBuffer, IntAttributeType::uint32, 1, sizeof(uint32_t), 0);
 
     IndirectDrawArgs command = { 4, (uint)squares.size(), 0, 0 };
     commandBuffer.setDataUnique(&command, sizeof(command), UniqueBufferUsage::none);
@@ -58,15 +59,14 @@ void TerrainRenderer::prepareRender() {
 void TerrainRenderer::render() {
     positionUniform.setValue(camera.position);
     vpMatrixUniform.setValue(camera.vpMatrix);
-    renderIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandBuffer, 0, 1, squaresBuffers, 2);
+    renderIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandBuffer, 0, 1, &squaresBuffer, 1);
 }
 
 
 void TerrainRenderer::dispose() {
     shader.dispose();
-    squaresBuffers[0].dispose();
-    squaresBuffers[1].dispose();
-    indicesBuffer.dispose();
+    squaresBuffer.dispose();
+    squaresIndicesBuffer.dispose();
     commandBuffer.dispose();
     vertexArray.dispose();
 }

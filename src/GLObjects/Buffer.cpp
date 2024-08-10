@@ -52,8 +52,8 @@ void Buffer::dispose() {
 
 StorageBuffer::StorageBuffer(int binding) :
     Buffer(BufferTarget::storage), binding(binding) {
-    if (binding > (int)boundStorageBuffers.size()) {
-        for (int i = boundStorageBuffers.size(); i < binding; i++) {
+    if (binding >= (int)boundStorageBuffers.size()) {
+        for (int i = boundStorageBuffers.size(); i <= binding; i++) {
             boundStorageBuffers.push_back(0);
         }
     }
