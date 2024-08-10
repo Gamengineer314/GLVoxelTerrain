@@ -17,7 +17,7 @@ TerrainRenderer::TerrainRenderer(Camera& camera)
     squares(vector<Square>()),
     squaresBuffers { StorageBuffer(0), StorageBuffer(1) },
     indicesBuffer(IndicesBuffer()),
-    commandBuffer(CommandsBuffer(sizeof(IndirectIndexedDrawArgs))),
+    commandBuffer(CommandsBuffer(sizeof(IndirectDrawArgs))),
     vertexArray(VertexArray()),
     positionUniform(shader.getUniform("position")),
     vpMatrixUniform(shader.getUniform("vpMatrix")) {
@@ -50,20 +50,15 @@ void TerrainRenderer::prepareRender() {
     squaresBuffers[1].setDataUnique(_squaresIndices, squares.size() * sizeof(uint32_t), UniqueBufferUsage::none);
     delete[] _squaresIndices;
 
-    uint8_t indices[] = { 0, 1, 2, 2, 1, 3 };
-    indicesBuffer.setDataUnique(indices, sizeof(indices), UniqueBufferUsage::none);
-
-    IndirectIndexedDrawArgs command = { 6, (uint)squares.size(), 0, 0, 0 };
+    IndirectDrawArgs command = { 4, (uint)squares.size(), 0, 0 };
     commandBuffer.setDataUnique(&command, sizeof(command), UniqueBufferUsage::none);
-
-    vertexArray.setIndices(indicesBuffer, IndexType::uint8);
 }
 
 
 void TerrainRenderer::render() {
     positionUniform.setValue(camera.position);
     vpMatrixUniform.setValue(camera.vpMatrix);
-    renderIndirect(GeometryMode::triangles, shader, vertexArray, commandBuffer, 0, 1, squaresBuffers, 2);
+    renderIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandBuffer, 0, 1, squaresBuffers, 2);
 }
 
 

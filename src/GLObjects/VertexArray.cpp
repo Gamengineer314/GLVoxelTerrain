@@ -1,6 +1,5 @@
 #include "GLObjects/VertexArray.hpp"
 
-#include <stdexcept>
 #include <glad/glad.h>
 
 #include "GLObjects/Buffer.hpp"
