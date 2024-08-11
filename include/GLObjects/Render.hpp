@@ -26,6 +26,28 @@ enum class GeometryMode : GLenum {
 };
 
 
+enum class MemoryBarrier : GLbitfield {
+    vertices = GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT,
+    indices = GL_ELEMENT_ARRAY_BARRIER_BIT,
+    uniform = GL_UNIFORM_BARRIER_BIT,
+    textureFetch = GL_TEXTURE_FETCH_BARRIER_BIT,
+    imageAccess = GL_SHADER_IMAGE_ACCESS_BARRIER_BIT,
+    indirectCommand = GL_COMMAND_BARRIER_BIT,
+    pixel = GL_PIXEL_BUFFER_BARRIER_BIT,
+    textureUpdate = GL_TEXTURE_UPDATE_BARRIER_BIT,
+    bufferUpdate = GL_BUFFER_UPDATE_BARRIER_BIT,
+    framebuffer = GL_FRAMEBUFFER_BARRIER_BIT,
+    transformFeedback = GL_TRANSFORM_FEEDBACK_BARRIER_BIT,
+    counter = GL_ATOMIC_COUNTER_BARRIER_BIT,
+    storage = GL_SHADER_STORAGE_BARRIER_BIT,
+    all = GL_ALL_BARRIER_BITS
+};
+
+constexpr MemoryBarrier operator|(MemoryBarrier barrier1, MemoryBarrier barrier2) {
+    return static_cast<MemoryBarrier>((GLbitfield)barrier1 | (GLbitfield)barrier2);
+}
+
+
 
 /**
  * @brief Initialize glad and OpenGL
@@ -45,20 +67,20 @@ void renderBackground(float r, float g, float b);
 
 
 /**
- * @brief Indirect draw call with commands provided as a buffer
+ * @brief Indirect draw call with commands provided in a buffer
  * @param geometryMode Geometry to draw
  * @param shader Shader to use
  * @param vertexArray Vertex array to use
  * @param commands Indirect draw command(s)
  * @param startCommand Index of the first command to draw
  * @param commandCount Number of commands to draw
- * @param storageBuffers Storage buffers to use
- * @param numStorageBuffers Number of elements in storageBuffers
+ * @param shaderBuffers Shader buffers to use
+ * @param numShaderBuffers Number of elements in shaderBuffers
 **/
-void renderIndirect(GeometryMode geometryMode, Shader shader, VertexArray vertexArray, CommandsBuffer commands, int startCommand, int commandCount, StorageBuffer* storageBuffers = nullptr, int numStorageBuffers = 0);
+void renderIndirect(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, IndirectDrawBuffer commands, int startCommand, int commandCount, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
 
 /**
- * @brief Indirect draw call with commands and command count provided as buffers
+ * @brief Indirect draw call with commands and command count provided in buffers
  * @param geometryMode Geometry to draw
  * @param shader Shader to use
  * @param vertexArray Vertex array to use
@@ -67,10 +89,17 @@ void renderIndirect(GeometryMode geometryMode, Shader shader, VertexArray vertex
  * @param parameters Command count parameter
  * @param parameterIndex Index of the parameter to use
  * @param maxCommandCount Maximum number of commands to draw
- * @param storageBuffers Storage buffers to use
- * @param numStorageBuffers Number of elements in storageBuffers
+ * @param shaderBuffers Shader buffers to use
+ * @param numShaderBuffers Number of elements in shaderBuffers
 **/
-void renderIndirect(GeometryMode geometryMode, Shader shader, VertexArray vertexArray, CommandsBuffer commands, ParametersBuffer parameters, int parameterIndex, int maxCommandCount, StorageBuffer* storageBuffers = nullptr, int numStorageBuffers = 0);
+void renderIndirect(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, IndirectDrawBuffer commands, ParametersBuffer parameters, int parameterIndex, int maxCommandCount, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
+
+
+/**
+ * @brief Use a memory barrier to order memory accesses
+ * @param barrier Memory barrier to use
+**/
+void memoryBarrier(MemoryBarrier barrier);
 
 
 

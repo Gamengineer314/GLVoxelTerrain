@@ -11,43 +11,32 @@
 using namespace std;
 using namespace glm;
 
-static GLuint usedProgram = 0;
+static GLuint usedProgram = (GLuint)-1;
 
 
 
-char* readAllText(const char* path) {
-    ifstream file = ifstream(path);
-    file.seekg(0, ios::end);
-    size_t size = file.tellg();
-    char* text = new char[size + 1];
-    file.seekg(0);
-    file.read(text, size);
-    text[size] = 0;
-    return text;
+Shader::Shader() :
+    program(glCreateProgram()) {
 }
 
 
+void Shader::attachShader(const char* path, ShaderType type) {
+    // Read file
+    ifstream file = ifstream(path);
+    file.seekg(0, ios::end);
+    size_t size = file.tellg();
+    char* shaderCode = new char[size + 1];
+    file.seekg(0);
+    file.read(shaderCode, size);
+    shaderCode[size] = 0;
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath) :
-    program(glCreateProgram()) {
-
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    char* vertexCode = readAllText(vertexPath);
-    glShaderSource(vertexShader, 1, &vertexCode, nullptr);
-    delete[] vertexCode;
-    glCompileShader(vertexShader);
-    glAttachShader(program, vertexShader);
-    glDeleteShader(vertexShader);
-
-    GLuint fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    char* fragmentCode = readAllText(fragmentPath);
-    glShaderSource(fragmentShader, 1, &fragmentCode, nullptr);
-    delete[] fragmentCode;
-    glCompileShader(fragmentShader);
-    glAttachShader(program, fragmentShader);
-    glDeleteShader(fragmentShader);
-
-    glLinkProgram(program);
+    // Compile and attach shader
+    GLuint shader = glCreateShader((GLenum)type);
+    glShaderSource(shader, 1, &shaderCode, nullptr);
+    delete[] shaderCode;
+    glCompileShader(shader);
+    glAttachShader(program, shader);
+    glDeleteShader(shader);
 }
 
 
@@ -86,7 +75,52 @@ void Shader::Uniform::setValue(vec3& value) {
     glUniform3fv(location, 1, value_ptr(value));
 }
 
+void Shader::Uniform::setValue(vec4& value) {
+    shader.use();
+    glUniform4fv(location, 1, value_ptr(value));
+}
+
 void Shader::Uniform::setValue(float value) {
     shader.use();
     glUniform1f(location, value);
+}
+
+
+
+GraphicsShader::GraphicsShader(const char* vertexPath, const char* fragmentPath) :
+    Shader() {
+    attachShader(vertexPath, ShaderType::vertex);
+    attachShader(fragmentPath, ShaderType::fragment);
+    glLinkProgram(program);
+}
+
+
+
+ComputeShader::ComputeShader(const char* path) :
+    Shader() {
+    attachShader(path, ShaderType::compute);
+    glLinkProgram(program);
+}
+
+
+void ComputeShader::dispatch(int numGroupsX, int numGroupsY, int numGroupsZ, ShaderBuffer* shaderBuffers, int numShaderBuffers) {
+    use();
+    if (shaderBuffers != nullptr) {
+        for (int i = 0; i < numShaderBuffers; i++) {
+            shaderBuffers[i].shaderBind();
+        }
+    }
+    glDispatchCompute(numGroupsX, numGroupsY, numGroupsZ);
+}
+
+
+void ComputeShader::dispatchIndirect(IndirectDispatchBuffer commands, int commandIndex, ShaderBuffer* shaderBuffers, int numShaderBuffers) {
+    use();
+    commands.bind();
+    if (shaderBuffers != nullptr) {
+        for (int i = 0; i < numShaderBuffers; i++) {
+            shaderBuffers[i].shaderBind();
+        }
+    }
+    glDispatchComputeIndirect((GLintptr)(commandIndex * commands.stride));
 }

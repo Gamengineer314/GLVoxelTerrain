@@ -9,6 +9,18 @@
 using namespace glm;
 
 
+
+enum class ShaderType : GLenum {
+    vertex = GL_VERTEX_SHADER,
+    fragment = GL_FRAGMENT_SHADER,
+    geometry = GL_GEOMETRY_SHADER,
+    compute = GL_COMPUTE_SHADER,
+    tessControl = GL_TESS_CONTROL_SHADER,
+    tessEvaluation = GL_TESS_EVALUATION_SHADER
+};
+
+
+
 class Shader {
 
 public:
@@ -38,6 +50,12 @@ public:
          * @brief Set the value of the vector uniform
          * @param value The value to set the uniform to
         **/
+        void setValue(vec4& value);
+
+        /**
+         * @brief Set the value of the vector uniform
+         * @param value The value to set the uniform to
+        **/
         void setValue(float value);
 
     private:
@@ -47,14 +65,12 @@ public:
     };
 
     /**
-     * @brief Create a new shader
-     * @param vertexPath Path to the vertex shader file
-     * @param fragmentPath Path to the fragment shader file
+     * @brief Create a new empty shader program
     **/
-    Shader(const char* vertexPath, const char* fragmentPath);
+    Shader();
 
     /**
-     * @brief Use the shader for future glDraw*() calls
+     * @brief Use the shader for future OpenGL calls
     **/
     void use();
 
@@ -69,10 +85,65 @@ public:
     **/
     void dispose();
 
-private:
+protected:
     GLuint program;
 
+    /**
+     * @brief Attach a new shader to the program
+     * @param path Path to the shader file
+     * @param type Shader type
+    **/
+    void attachShader(const char* path, ShaderType type);
+
 };
+
+
+
+class GraphicsShader : public Shader {
+
+public:
+    /**
+     * @brief Create a new shader for rendering
+     * @param vertexPath Path to the vertex shader file
+     * @param fragmentPath Path to the fragment shader file
+    **/
+    GraphicsShader(const char* vertexPath, const char* fragmentPath);
+
+};
+
+
+
+class ComputeShader : public Shader {
+
+public:
+    /**
+     * @brief Create a new compute shader
+     * @param path Path to the compute shader file
+    **/
+    ComputeShader(const char* path);
+
+    /**
+     * @brief Dispatch the compute shader
+     * @param numGroupsX Number of work groups in the X dimension
+     * @param numGroupsY Number of work groups in the Y dimension
+     * @param numGroupsZ Number of work groups in the Z dimension
+     * @param shaderBuffers Shader buffers to use
+     * @param numShaderBuffers Number of elements in shaderBuffers
+    **/
+    void dispatch(int numGroupsX, int numGroupsY, int numGroupsZ, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
+
+    /**
+     * @brief Dispatch the compute shader with commands provided as a buffer
+     * @param commands Indirect dispatch command(s)
+     * @param commandIndex Index of the command to use
+     * @param barrier Memory barrier to use
+     * @param shaderBuffers Shader buffers to use
+     * @param numShaderBuffers Number of elements in shaderBuffers
+    **/
+    void dispatchIndirect(IndirectDispatchBuffer commands, int commandIndex, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
+
+};
+
 
 
 #endif // SHADER_H

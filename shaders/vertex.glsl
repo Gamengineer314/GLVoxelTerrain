@@ -63,7 +63,7 @@ void main() {
     pos[1u & ~normalAxis] += -interleaving + ((uint(gl_VertexID) & 1u) ^ uint(normalAxis != 0) ^ (normalID & 1u)) * (width + 2 * interleaving);
     pos[2u & ~normalAxis] += -interleaving + (gl_VertexID >> 1) * (height + 2 * interleaving);
     vec3 normal = vec3(0, 0, 0);
-    normal[normalAxis] = -2 * float(normalID & 1u) - 1;
+    normal[normalAxis] = -2 * float(normalID & 1u) + 1;
 
     // Output
     gl_Position = vpMatrix * vec4(pos, 1);

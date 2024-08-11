@@ -30,23 +30,23 @@ enum class UniqueBufferUsage : GLbitfield {
 };
 
 
-enum class BufferTarget : GLenum {
-    vertices = GL_ARRAY_BUFFER,
-    instances = GL_ARRAY_BUFFER,
-    indices = GL_ELEMENT_ARRAY_BUFFER,
-    storage = GL_SHADER_STORAGE_BUFFER,
-    uniform = GL_UNIFORM_BUFFER,
-    commands = GL_DRAW_INDIRECT_BUFFER,
-    dispatch = GL_DISPATCH_INDIRECT_BUFFER,
-    parameters = GL_PARAMETER_BUFFER,
-    pixelPack = GL_PIXEL_PACK_BUFFER,
-    pixelUnpack = GL_PIXEL_UNPACK_BUFFER,
-    query = GL_QUERY_BUFFER,
-    texture = GL_TEXTURE_BUFFER,
-    transformFeedback = GL_TRANSFORM_FEEDBACK_BUFFER,
-    counter = GL_ATOMIC_COUNTER_BUFFER,
-    copyRead = GL_COPY_READ_BUFFER,
-    copyWrite = GL_COPY_WRITE_BUFFER,
+enum class BufferTarget : int { // GLenum
+    storage = 0, // GL_SHADER_STORAGE_BUFFER
+    uniform = 1, // GL_UNIFORM_BUFFER
+    counters = 2, // GL_ATOMIC_COUNTER_BUFFER
+    transformFeedback = 3, // GL_TRANSFORM_FEEDBACK_BUFFER
+    vertices = 4, // GL_ARRAY_BUFFER
+    instances = 5, // GL_ARRAY_BUFFER
+    indices = 6, // GL_ELEMENT_ARRAY_BUFFER
+    indirectDraw = 7, // GL_DRAW_INDIRECT_BUFFER
+    indirectDispatch = 8, // GL_DISPATCH_INDIRECT_BUFFER
+    parameters = 9, // GL_PARAMETER_BUFFER
+    pixelPack = 10, // GL_PIXEL_PACK_BUFFER
+    pixelUnpack = 11, // GL_PIXEL_UNPACK_BUFFER
+    query = 12, // GL_QUERY_BUFFER
+    texture = 13, // GL_TEXTURE_BUFFER
+    copyRead = 14, // GL_COPY_READ_BUFFER
+    copyWrite = 15, // GL_COPY_WRITE_BUFFER
 };
 
 
@@ -68,14 +68,29 @@ struct IndirectIndexedDrawArgs {
 };
 
 
+struct IndirectDispatchArgs {
+    uint32_t numGroupsX;
+    uint32_t numGroupsY;
+    uint32_t numGroupsZ;
+};
+
+
 
 class Buffer {
 
 public:
     /**
      * @brief Create a new buffer
+     * @param target Buffer target
     **/
     explicit Buffer(BufferTarget target);
+
+    /**
+     * @brief Create a new buffer referencing an existing buffer
+     * @param target Target of the new buffer
+     * @param buffer Buffer to reference
+    **/
+    Buffer(Buffer buffer, BufferTarget target);
 
     /**
      * @brief Set the data of the buffer. No more calls to setDataUnique() can then be made.
@@ -102,14 +117,24 @@ public:
     void modifyData(void* data, size_t offset, size_t size);
 
     /**
+     * @brief Get a part of the buffer
+     * @param offset Start of the part of the buffer to get (in bytes)
+     * @param size Size of the part of the buffer to get (in bytes)
+     * @return Pointer to the data (must be deallocated after use)
+    **/
+    void* getData(size_t offset, size_t size);
+
+    /**
+     * @brief Set a part of the buffer to zero
+     * @param offset Start of the part of the buffer to clear (in bytes)
+     * @param size Size of the part of the buffer to clear (in bytes)
+     */
+    void clearData(size_t offset, size_t size);
+
+    /**
      * @brief Use the buffer for future OpenGL calls
     **/
     void bind();
-
-    /**
-     * @brief Stop using the buffer for future OpenGL calls
-    **/
-    void unbind();
 
     /**
      * @brief Delete the buffer
@@ -118,7 +143,37 @@ public:
 
 protected:
     GLuint buffer;
-    BufferTarget target;
+    int target;
+
+};
+
+
+
+class ShaderBuffer : public Buffer {
+
+public:
+    /**
+     * @brief Create a new shader buffer
+     * @param binding Binding of the buffer in the shader(s)
+     * @param target Buffer target
+    **/
+    explicit ShaderBuffer(int binding, BufferTarget target);
+
+    /**
+     * @brief Create a new shader buffer referencing an existing buffer
+     * @param binding Binding of the buffer in the shader(s)
+     * @param buffer Buffer to reference
+     * @param target Target of the new buffer
+    **/
+    ShaderBuffer(int binding, Buffer buffer, BufferTarget target);
+
+    /**
+     * @brief Use the shader buffer for future OpenGL calls
+    **/
+    void shaderBind();
+
+private:
+    GLuint binding;
 
 };
 
@@ -127,7 +182,16 @@ protected:
 class VerticesBuffer : public Buffer {
 
 public:
+    /**
+     * @brief Create a new vertices buffer
+    **/
     VerticesBuffer() : Buffer(BufferTarget::vertices) {}
+
+    /**
+     * @brief Create a new vertices buffer referencing an existing buffer
+     * @param buffer Buffer to reference
+    **/
+    explicit VerticesBuffer(Buffer buffer) : Buffer(buffer, BufferTarget::vertices) {}
 
 };
 
@@ -136,7 +200,16 @@ public:
 class InstancesBuffer : public Buffer {
 
 public:
+    /**
+     * @brief Create a new instances buffer
+    **/
     InstancesBuffer() : Buffer(BufferTarget::instances) {}
+
+    /**
+     * @brief Create a new instances buffer referencing an existing buffer
+     * @param buffer Buffer to reference
+    **/
+    explicit InstancesBuffer(Buffer buffer) : Buffer(buffer, BufferTarget::vertices) {}
 
 };
 
@@ -145,48 +218,100 @@ public:
 class IndicesBuffer : public Buffer {
 
 public:
-    IndicesBuffer() : Buffer(BufferTarget::indices) {}
+    /**
+     * @brief Create a new indices buffer
+    **/
+    IndicesBuffer() : Buffer(BufferTarget::instances) {}
+
+    /**
+     * @brief Create a new indices buffer referencing an existing buffer
+     * @param buffer Buffer to reference
+    **/
+    explicit IndicesBuffer(Buffer buffer) : Buffer(buffer, BufferTarget::vertices) {}
 
 };
 
 
 
-class StorageBuffer : public Buffer {
+class StorageBuffer : public ShaderBuffer {
 
 public:
     /**
      * @brief Create a new storage buffer
      * @param binding Binding of the buffer in the shader(s)
     **/
-    explicit StorageBuffer(int binding);
+    StorageBuffer(int binding) : ShaderBuffer(binding, BufferTarget::storage) {}
 
     /**
-     * @brief Use the storage buffer for future OpenGL calls
+     * @brief Create a new storage buffer referencing an existing buffer
+     * @param binding Binding of the buffer in the shader(s)
+     * @param buffer Buffer to reference
     **/
-    void bind();
-
-    /**
-     * @brief Stop using the storage buffer for future OpenGL calls
-    **/
-    void unbind();
-
-public:
-    GLuint binding;
+    explicit StorageBuffer(int binding, Buffer buffer) : ShaderBuffer(binding, buffer, BufferTarget::storage) {}
 
 };
 
 
 
-class CommandsBuffer : public Buffer {
+class CountersBuffer : public ShaderBuffer {
+
+public:
+    /**
+     * @brief Create a new counters buffer
+     * @param binding Binding of the buffer in the shader(s)
+    **/
+    CountersBuffer(int binding) : ShaderBuffer(binding, BufferTarget::counters) {}
+
+    /**
+     * @brief Create a new counters buffer referencing an existing buffer
+     * @param binding Binding of the buffer in the shader(s)
+     * @param buffer Buffer to reference
+    **/
+    explicit CountersBuffer(int binding, Buffer buffer) : ShaderBuffer(binding, buffer, BufferTarget::counters) {}
+
+};
+
+
+
+class IndirectDrawBuffer : public Buffer {
 
 public:
     int stride;
 
     /**
-     * @brief Create a new commands buffer
-     * @param stride Size of a command (in bytes)
+     * @brief Create a new indirect draw buffer
+     * @param stride Size of a draw command (in bytes)
     **/
-    explicit CommandsBuffer(int stride) : Buffer(BufferTarget::commands), stride(stride) {}
+    explicit IndirectDrawBuffer(int stride) : Buffer(BufferTarget::indirectDraw), stride(stride) {}
+
+    /**
+     * @brief Create a new indirect draw buffer referencing an existing buffer
+     * @param stride Size of a draw command (in bytes)
+     * @param buffer Buffer to reference
+    **/
+    IndirectDrawBuffer(int stride, Buffer buffer) : Buffer(buffer, BufferTarget::indirectDraw), stride(stride) {}
+
+};
+
+
+
+class IndirectDispatchBuffer : public Buffer {
+
+public:
+    int stride;
+
+    /**
+     * @brief Create a new indirect dispatch buffer
+     * @param stride Size of a dispatch command (in bytes)
+    **/
+    explicit IndirectDispatchBuffer(int stride) : Buffer(BufferTarget::indirectDispatch), stride(stride) {}
+
+    /**
+     * @brief Create a new indirect dispatch buffer referencing an existing buffer
+     * @param stride Size of a dispatch command (in bytes)
+     * @param buffer Buffer to reference
+    **/
+    IndirectDispatchBuffer(int stride, Buffer buffer) : Buffer(buffer, BufferTarget::indirectDispatch), stride(stride) {}
 
 };
 
@@ -202,6 +327,13 @@ public:
      * @param stride Size of a parameter (in bytes)
     **/
     explicit ParametersBuffer(int stride) : Buffer(BufferTarget::parameters), stride(stride) {}
+
+    /**
+     * @brief Create a new parameters buffer referencing an existing buffer
+     * @param stride Size of a parameter (in bytes)
+     * @param buffer Buffer to reference
+    **/
+    ParametersBuffer(int stride, Buffer buffer) : Buffer(buffer, BufferTarget::parameters), stride(stride) {}
 
 };
 

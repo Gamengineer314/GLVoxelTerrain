@@ -8,9 +8,7 @@ using namespace std;
 
 Window::Window(int width, int height, const char* title, bool vsync) :
     width(width),
-    height(height), 
-    lastCursorX(width / 2),
-    lastCursorY(height / 2) {
+    height(height) {
 
     // Init GLFW
     if (glfwInit() == GLFW_FALSE) throw runtime_error("glfwInit error");
@@ -23,6 +21,7 @@ Window::Window(int width, int height, const char* title, bool vsync) :
     if (window == nullptr) throw runtime_error("glfwCreateWindow error");
     glfwMakeContextCurrent(window);
     if (!vsync) glfwSwapInterval(0);
+    getCursorPosition(lastCursorX, lastCursorY);
 }
 
 

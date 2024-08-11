@@ -110,14 +110,6 @@ void VertexArray::bind() {
 }
 
 
-void VertexArray::unbind() {
-    if (boundArray != 0) {
-        glBindVertexArray(0);
-        boundArray = 0;
-    }
-}
-
-
 void VertexArray::dispose() {
     glDeleteVertexArrays(1, &array);
 }

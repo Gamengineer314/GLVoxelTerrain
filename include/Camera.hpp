@@ -19,7 +19,7 @@ public:
     vec3 position;
     quat orientation;
 
-    vec4 farPlane;
+    vec4 farPlane; // x,y,z: normal, w: distance
     vec4 leftPlane;
     vec4 rightPlane;
     vec4 upPlane;

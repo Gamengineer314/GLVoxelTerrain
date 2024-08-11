@@ -20,11 +20,11 @@ VoxelMesh::VoxelMesh(CubeNormal normal, int chunkX, int chunkZ, int startY) :
     maxZ(0) {
 }
 
-#include <iostream>
-using namespace std;
+
+
 Square VoxelMesh::add(int x, int y, int depth, int width, int height, int colorID) {
     squaresCount++;
-    u32vec3 min = position;
+    u32vec3 min = vec3(0, 0, 0);
     min[WIDTH_AXIS(AXIS(normal))] += x;
     min[HEIGHT_AXIS(AXIS(normal))] += y;
     min[AXIS(normal)] += depth + NORMAL_POSITIVE(normal);
@@ -37,7 +37,7 @@ Square VoxelMesh::add(int x, int y, int depth, int width, int height, int colorI
     if (max.x > maxX) maxX = max.x;
     if (max.y > maxY) maxY = max.y;
     if (max.z > maxZ) maxZ = max.z;
-    u32vec3 pos = min;
+    u32vec3 pos = min + position;
     return Square(pos.x, pos.y, pos.z, width, height, normal, colorID);
 }
 
@@ -62,7 +62,7 @@ Square::Square(uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint3
 
 MeshData::MeshData(vec3 center, vec3 size, uint32_t normal, uint32_t squareCount, uint32_t startSquare) :
     center(center),
-    size(size),
     data1(normal | (squareCount << 3)),
+    size(size),
     data2(startSquare) {
 }

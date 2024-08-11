@@ -11,8 +11,8 @@
 
 using namespace std;
 
-// Number of threads in a group for the compute shader
-#define THREAD_GROUP_SIZE 64
+// Number of threads in a work group for the compute shader
+#define THREAD_GROUP_SIZE 256
 // Remove small (1 pixel) gaps between triangles
 #define QUADS_INTERLEAVING 0.05f
 
@@ -52,16 +52,25 @@ public:
 
 private:
     Camera& camera;
-    Shader shader;
+    GraphicsShader shader;
     vector<MeshData> meshData; // All meshes information (position, size, rectangles indices)
     vector<Square> squares; // All rectangles (position, width, height, normal)
     StorageBuffer squaresBuffer;
     InstancesBuffer squaresIndicesBuffer;
-    CommandsBuffer commandBuffer;
+    IndirectDrawBuffer commandBuffer;
     VertexArray vertexArray;
-    Shader::Uniform positionUniform;
+    Shader::Uniform graphicsPositionUniform;
     Shader::Uniform vpMatrixUniform;
-    GLuint threadGroups;
+
+    ComputeShader frustrumCulling;
+    StorageBuffer meshDataBuffer;
+    Shader::Uniform frustrumPositionUniform;
+    Shader::Uniform farPlaneUniform;
+    Shader::Uniform leftPlaneUniform;
+    Shader::Uniform rightPlaneUniform;
+    Shader::Uniform upPlaneUniform;
+    Shader::Uniform downPlaneUniform;
+    GLuint workGroups;
 
 };
 

@@ -11,7 +11,6 @@
 #include "GLObjects/Render.hpp"
 #include "GLObjects/Buffer.hpp"
 #include "GLObjects/VertexArray.hpp"
-#include "GLObjects/Shader.hpp"
 #include "Camera.hpp"
 #include "CameraController.hpp"
 #include "VoxelMesh.hpp"
@@ -28,8 +27,8 @@ using namespace chrono;
 using namespace chrono_literals;
 using namespace glm;
 
-#define WINDOW_WIDTH 800
-#define WINDOW_HEIGHT 800
+#define WINDOW_WIDTH 1920
+#define WINDOW_HEIGHT 1080
 #define TITLE "Voxel Engine"
 
 
@@ -47,7 +46,7 @@ int main() {
     // Initialize objects
     Window window = Window(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
     renderInit(WINDOW_WIDTH, WINDOW_HEIGHT);
-    Camera camera = Camera(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Camera camera = Camera(WINDOW_WIDTH, WINDOW_HEIGHT, 60, 0.1, 1500, vec3(2048, 100, 2048), 0, 0);
     CameraController controller = CameraController(window, camera, WINDOW_WIDTH, WINDOW_HEIGHT);
     TerrainRenderer renderer = TerrainRenderer(camera);
     renderer.addMeshes(meshes, squares);

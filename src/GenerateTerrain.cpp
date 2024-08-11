@@ -33,7 +33,7 @@ void generateTerrain(int*& IDs, uint32_t*& IDIndexes) {
     memcpy(IDs, IDsVec.data(), IDsVec.size() * sizeof(int));
 }
 
-
+#include <iostream>
 void generateHeightMap(int*& heightMap, int*& ids) {
     int index = 0;
     for (int z = 0; z < HORIZONTAL_SIZE; z++) {
@@ -54,7 +54,7 @@ void generateIDs(int* heightMap, int* ids, vector<int>& IDs, uint32_t* IDIndexes
                 for (int xInChunk = 0; xInChunk < CHUNK_SIZE; xInChunk++) {
                     int x = chunkX * CHUNK_SIZE + xInChunk;
                     int z = chunkZ * CHUNK_SIZE + zInChunk;
-                    int y = heightMap[x + z * HORIZONTAL_SIZE] - 1;
+                    int y = heightMap[x + z * HORIZONTAL_SIZE];
                     IDIndexes[(chunkX + chunkZ * HORIZONTAL_CHUNKS) * CHUNK_SIZE * CHUNK_SIZE + xInChunk + zInChunk * CHUNK_SIZE] = IDs.size();
 
                     // Add zeros below the block to not render invisible faces, then add the block

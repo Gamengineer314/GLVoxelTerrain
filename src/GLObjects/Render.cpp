@@ -31,13 +31,13 @@ void renderBackground(float r, float g, float b) {
 }
 
 
-void renderIndirect(GeometryMode geometryMode, Shader shader, VertexArray vertexArray, CommandsBuffer commands, int startCommand, int commandCount, StorageBuffer* storageBuffers, int numStorageBuffers) {
+void renderIndirect(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, IndirectDrawBuffer commands, int startCommand, int commandCount, ShaderBuffer* shaderBuffers, int numShaderBuffers) {
     commands.bind();
     shader.use();
     vertexArray.bind();
-    if (storageBuffers != nullptr) {
-        for (int i = 0; i < numStorageBuffers; i++) {
-            storageBuffers[i].bind();
+    if (shaderBuffers != nullptr) {
+        for (int i = 0; i < numShaderBuffers; i++) {
+            shaderBuffers[i].shaderBind();
         }
     }
 
@@ -52,17 +52,22 @@ void renderIndirect(GeometryMode geometryMode, Shader shader, VertexArray vertex
 }
 
 
-void renderIndirect(GeometryMode geometryMode, Shader shader, VertexArray vertexArray, CommandsBuffer commands, int startCommand, ParametersBuffer parameters, int parameterIndex, int maxCommandCount, StorageBuffer* storageBuffers, int numStorageBuffers) {
+void renderIndirect(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, IndirectDrawBuffer commands, int startCommand, ParametersBuffer parameters, int parameterIndex, int maxCommandCount, ShaderBuffer* shaderBuffers, int numShaderBuffers) {
     shader.use();
     vertexArray.bind();
     commands.bind();
     parameters.bind();
-    if (storageBuffers != nullptr) {
-        for (int i = 0; i < numStorageBuffers; i++) {
-            storageBuffers[i].bind();
+    if (shaderBuffers != nullptr) {
+        for (int i = 0; i < numShaderBuffers; i++) {
+            shaderBuffers[i].shaderBind();
         }
     }
 
     if (vertexArray.indexed) glMultiDrawElementsIndirectCount((GLenum)geometryMode, (GLenum)vertexArray.indexType, reinterpret_cast<void*>(startCommand * parameters.stride), parameterIndex * parameters.stride, maxCommandCount, commands.stride);
     else glMultiDrawArraysIndirectCount((GLenum)geometryMode, reinterpret_cast<void*>(startCommand * parameters.stride), parameterIndex * parameters.stride, maxCommandCount, commands.stride);
+}
+
+
+void memoryBarrier(MemoryBarrier barrier) {
+    glMemoryBarrier((GLbitfield)barrier);
 }

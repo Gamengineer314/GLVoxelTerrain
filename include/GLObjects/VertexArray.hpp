@@ -184,11 +184,6 @@ public:
     void bind();
 
     /**
-     * @brief Stop using the array for future OpenGL calls
-    **/
-    void unbind();
-
-    /**
      * @brief Delete the array
     **/
     void dispose();

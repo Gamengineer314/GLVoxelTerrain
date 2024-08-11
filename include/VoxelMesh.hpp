@@ -101,10 +101,10 @@ public:
     MeshData(vec3 center, vec3 size, uint32_t normal, uint32_t squareCount, uint32_t startSquare);
     MeshData(VoxelMesh& mesh, uint32_t startSquare) : MeshData(mesh.center(), mesh.size(), mesh.normal, mesh.squaresCount, startSquare) {};
 
-private:
+public:
     vec3 center;
-    vec3 size;
     uint32_t data1; // normal (3b), squareCount (29b)
+    vec3 size;
     uint32_t data2; // startSquare (32b)
 
 };
