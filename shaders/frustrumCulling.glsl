@@ -31,6 +31,7 @@ layout(binding = 0, std430) readonly restrict buffer meshDataBuffer { MeshData m
 
 // Outputs
 layout(binding = 1, std430) restrict buffer commandsBuffer { IndirectDrawArgs commands[]; }; // Indices of the squares to render
+layout(binding = 0, offset = 0) uniform atomic_uint commandsCount; // Number of squares to render
 
 
 bool outsidePlane(vec3 center, vec3 size, vec4 plane) {
@@ -65,11 +66,8 @@ void main() {
     normal[normalID >> 1] = -2 * float(normalID & 1u) + 1;
 
 	if (cameraCulling(mesh.center, mesh.size, normal)) {
-		commands[gl_GlobalInvocationID.x].instanceCount = squaresCount;
-		commands[gl_GlobalInvocationID.x].baseInstance = startSquare;
-	}
-	else {
-		commands[gl_GlobalInvocationID.x].instanceCount = 0;
-		commands[gl_GlobalInvocationID.x].baseInstance = 0;
+		uint commandIndex = atomicCounterIncrement(commandsCount);
+		commands[commandIndex].instanceCount = squaresCount;
+		commands[commandIndex].baseInstance = startSquare;
 	}
 }

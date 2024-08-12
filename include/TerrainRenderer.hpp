@@ -63,6 +63,7 @@ private:
 
     ComputeShader frustrumCulling;
     StorageBuffer meshDataBuffer;
+    ParametersBuffer paramsBuffer;
     Shader::Uniform frustrumPositionUniform;
     Shader::Uniform farPlaneUniform;
     Shader::Uniform leftPlaneUniform;
