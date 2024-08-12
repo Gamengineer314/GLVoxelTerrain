@@ -6,11 +6,6 @@ out struct V2F {
 } v2f;
 
 
-struct Square {
-    uint data1; // x (13b), z (13b)
-    uint data2; // y (9b), width (6b), height (6b), normal (3b), color (8b)
-};
-
 #define mask2Bits 3u             // 0b11
 #define mask3Bits 7u             // 0b111
 #define mask4Bits 15u            // 0b1111
@@ -38,8 +33,7 @@ const vec4 colors[5] = {
 };
 
 
-layout(binding = 0, std430) readonly restrict buffer squaresBuffer { Square squares[]; };
-layout(location = 0) in uint squareIndex;
+layout(location = 0) in uvec2 square; // x: x (13b), z (13b) ; y: y (9b), width (6b), height (6b), normal (3b), color (8b)
 
 uniform mat4 vpMatrix;
 uniform vec3 position;
@@ -47,14 +41,11 @@ uniform float quadsInterleaving; // Size increase to remove small (1 pixel) gaps
 
 
 void main() {
-    // Get square
-    Square square = squares[squareIndex];
-
     // Unpack data
-    vec3 cubePos = vec3(square.data1 & mask13Bits, square.data2 & mask9Bits, square.data1 >> 13);
-    uint normalID = (square.data2 >> 21) & mask3Bits;
-    float width = ((square.data2 >> 9) & mask6Bits) + 1;
-    float height = ((square.data2 >> 15) & mask6Bits) + 1;
+    vec3 cubePos = vec3(square.x & mask13Bits, square.y & mask9Bits, square.x >> 13);
+    uint normalID = (square.y >> 21) & mask3Bits;
+    float width = ((square.y >> 9) & mask6Bits) + 1;
+    float height = ((square.y >> 15) & mask6Bits) + 1;
     uint normalAxis = normalID >> 1;
 
     // Position
@@ -68,5 +59,5 @@ void main() {
     // Output
     gl_Position = vpMatrix * vec4(pos, 1);
     v2f.blockData = vec4(pos - normal * 0.5f, faceLightLevels[normalID]);
-    v2f.color = colors[square.data2 >> 24];
+    v2f.color = colors[square.y >> 24];
 }

@@ -52,10 +52,10 @@ enum class BufferTarget : int { // GLenum
 
 
 struct IndirectDrawArgs {
-    uint32_t  count;
-    uint32_t  instanceCount;
-    uint32_t  first;
-    uint32_t  baseInstance;
+    uint32_t count;
+    uint32_t instanceCount;
+    uint32_t first;
+    uint32_t baseInstance;
 };
 
 

@@ -27,7 +27,10 @@ static GLenum bufferTargets[] = {
     GL_COPY_WRITE_BUFFER
 };
 
-static GLuint boundBuffers[16] = { (GLuint)-1 };
+static GLuint boundBuffers[16] = { 
+    (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, 
+    (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1 
+};
 static vector<GLuint> shaderBoundBuffers[4] = { vector<GLuint>() };
 
 

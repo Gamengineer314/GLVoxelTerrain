@@ -92,7 +92,7 @@ void renderIndirect(GeometryMode geometryMode, GraphicsShader shader, VertexArra
  * @param shaderBuffers Shader buffers to use
  * @param numShaderBuffers Number of elements in shaderBuffers
 **/
-void renderIndirect(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, IndirectDrawBuffer commands, ParametersBuffer parameters, int parameterIndex, int maxCommandCount, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
+void renderIndirect(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, IndirectDrawBuffer commands, int startCommand, ParametersBuffer parameters, int parameterIndex, int maxCommandCount, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
 
 
 /**

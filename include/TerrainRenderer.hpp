@@ -55,15 +55,15 @@ private:
     GraphicsShader shader;
     vector<MeshData> meshData; // All meshes information (position, size, rectangles indices)
     vector<Square> squares; // All rectangles (position, width, height, normal)
-    StorageBuffer squaresBuffer;
-    InstancesBuffer squaresIndicesBuffer;
-    IndirectDrawBuffer commandBuffer;
+    InstancesBuffer squaresBuffer;
+    IndirectDrawBuffer commandsBuffer;
     VertexArray vertexArray;
     Shader::Uniform graphicsPositionUniform;
     Shader::Uniform vpMatrixUniform;
 
     ComputeShader frustrumCulling;
     StorageBuffer meshDataBuffer;
+    ParametersBuffer paramsBuffer;
     Shader::Uniform frustrumPositionUniform;
     Shader::Uniform farPlaneUniform;
     Shader::Uniform leftPlaneUniform;

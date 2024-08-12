@@ -10,6 +10,13 @@ struct MeshData {
 	uint data2; // startSquare (32b)
 };
 
+struct IndirectDrawArgs {
+	uint count;
+    uint instanceCount;
+    uint first;
+    uint baseInstance;
+};
+
 #define mask3Bits 7u // 0b111
 
 
@@ -23,8 +30,8 @@ uniform vec3 position;
 layout(binding = 0, std430) readonly restrict buffer meshDataBuffer { MeshData meshData[]; }; // All meshes information (position, size, squares indices)
 
 // Outputs
-layout(binding = 0, offset = 4) uniform atomic_uint instanceCount; // Number of squares to render
-layout(binding = 1, std430) buffer squaresIndicesBuffer { uint squaresIndices[]; }; // Indices of the squares to render
+layout(binding = 1, std430) restrict buffer commandsBuffer { IndirectDrawArgs commands[]; }; // Indices of the squares to render
+layout(binding = 0, offset = 0) uniform atomic_uint commandsCount; // Number of squares to render
 
 
 bool outsidePlane(vec3 center, vec3 size, vec4 plane) {
@@ -59,9 +66,8 @@ void main() {
     normal[normalID >> 1] = -2 * float(normalID & 1u) + 1;
 
 	if (cameraCulling(mesh.center, mesh.size, normal)) {
-		uint startIndex = atomicCounterAdd(instanceCount, squaresCount);
-		for (uint i = 0; i < squaresCount; i++) {
-			squaresIndices[startIndex + i] = startSquare + i;
-		}
+		uint commandIndex = atomicCounterIncrement(commandsCount);
+		commands[commandIndex].instanceCount = squaresCount;
+		commands[commandIndex].baseInstance = startSquare;
 	}
 }

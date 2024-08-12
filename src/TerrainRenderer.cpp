@@ -16,14 +16,14 @@ TerrainRenderer::TerrainRenderer(Camera& camera)
     shader(GraphicsShader("shaders/vertex.glsl", "shaders/fragment.glsl")),
     meshData(vector<MeshData>()),
     squares(vector<Square>()),
-    squaresBuffer(StorageBuffer(0)),
-    squaresIndicesBuffer(InstancesBuffer()),
-    commandBuffer(IndirectDrawBuffer(sizeof(IndirectDrawArgs))),
+    squaresBuffer(InstancesBuffer()),
+    commandsBuffer(IndirectDrawBuffer(sizeof(IndirectDrawArgs))),
     vertexArray(VertexArray()),
     graphicsPositionUniform(shader.getUniform("position")),
     vpMatrixUniform(shader.getUniform("vpMatrix")),
     frustrumCulling(ComputeShader("shaders/frustrumCulling.glsl")),
     meshDataBuffer(StorageBuffer(0)),
+    paramsBuffer(ParametersBuffer(sizeof(uint32_t))),
     frustrumPositionUniform(frustrumCulling.getUniform("position")),
     farPlaneUniform(frustrumCulling.getUniform("farPlane")),
     leftPlaneUniform(frustrumCulling.getUniform("leftPlane")),
@@ -53,14 +53,17 @@ void TerrainRenderer::prepareRender() {
 
     // Create buffers
     squaresBuffer.setDataUnique(squares.data(), squares.size() * sizeof(Square), UniqueBufferUsage::none);
-    squaresIndicesBuffer.setDataUnique(nullptr, squares.size() * sizeof(uint32_t), UniqueBufferUsage::none);
-    vertexArray.setInstancesInt(0, squaresIndicesBuffer, IntAttributeType::uint32, 1, sizeof(uint32_t), 0);
-    IndirectDrawArgs command = { 4, 0, 0, 0 };
-    commandBuffer.setDataUnique(&command, sizeof(command), UniqueBufferUsage::none);
+    vertexArray.setInstancesInt(0, squaresBuffer, IntAttributeType::uint32, 2, 2 * sizeof(uint32_t), 0);
+    IndirectDrawArgs* commands = new IndirectDrawArgs[meshData.size()];
+    fill(commands, commands + meshData.size(), IndirectDrawArgs { 4, 0, 0, 0 });
+    commandsBuffer.setDataUnique(commands, meshData.size() * sizeof(IndirectDrawArgs), UniqueBufferUsage::none);
+    delete[] commands;
     meshDataBuffer.setDataUnique(meshData.data(), meshData.size() * sizeof(MeshData), UniqueBufferUsage::none);
+    paramsBuffer.setDataUnique(nullptr, sizeof(uint32_t), UniqueBufferUsage::none);
 }
 
 
+#include <iostream>
 void TerrainRenderer::render() {
     // Frustrum culling
     frustrumPositionUniform.setValue(camera.position);
@@ -69,24 +72,24 @@ void TerrainRenderer::render() {
     rightPlaneUniform.setValue(camera.rightPlane);
     upPlaneUniform.setValue(camera.upPlane);
     downPlaneUniform.setValue(camera.downPlane);
-    commandBuffer.clearData(4, 4);
-    ShaderBuffer frustrumCullingBuffers[] = { meshDataBuffer, CountersBuffer(0, commandBuffer), StorageBuffer(1, squaresIndicesBuffer) };
+    paramsBuffer.clearData(0, 4);
+    ShaderBuffer frustrumCullingBuffers[] = { meshDataBuffer, StorageBuffer(1, commandsBuffer), CountersBuffer(0, paramsBuffer) };
     frustrumCulling.dispatch(workGroups, 1, 1, frustrumCullingBuffers, 3);
     memoryBarrier(MemoryBarrier::storage | MemoryBarrier::indirectCommand);
 
     // Draw
     graphicsPositionUniform.setValue(camera.position);
     vpMatrixUniform.setValue(camera.vpMatrix);
-    renderIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandBuffer, 0, 1, &squaresBuffer, 1);
+    renderIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandsBuffer, 0, paramsBuffer, 0, meshData.size());
 }
 
 
 void TerrainRenderer::dispose() {
     shader.dispose();
     squaresBuffer.dispose();
-    squaresIndicesBuffer.dispose();
-    commandBuffer.dispose();
+    commandsBuffer.dispose();
     vertexArray.dispose();
     frustrumCulling.dispose();
     meshDataBuffer.dispose();
+    paramsBuffer.dispose();
 }
