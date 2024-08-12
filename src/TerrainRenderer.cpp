@@ -23,7 +23,6 @@ TerrainRenderer::TerrainRenderer(Camera& camera)
     vpMatrixUniform(shader.getUniform("vpMatrix")),
     frustrumCulling(ComputeShader("shaders/frustrumCulling.glsl")),
     meshDataBuffer(StorageBuffer(0)),
-    paramsBuffer(ParametersBuffer(sizeof(uint32_t))),
     frustrumPositionUniform(frustrumCulling.getUniform("position")),
     farPlaneUniform(frustrumCulling.getUniform("farPlane")),
     leftPlaneUniform(frustrumCulling.getUniform("leftPlane")),
@@ -59,11 +58,9 @@ void TerrainRenderer::prepareRender() {
     commandsBuffer.setDataUnique(commands, meshData.size() * sizeof(IndirectDrawArgs), UniqueBufferUsage::none);
     delete[] commands;
     meshDataBuffer.setDataUnique(meshData.data(), meshData.size() * sizeof(MeshData), UniqueBufferUsage::none);
-    paramsBuffer.setDataUnique(nullptr, sizeof(uint32_t), UniqueBufferUsage::none);
 }
 
 
-#include <iostream>
 void TerrainRenderer::render() {
     // Frustrum culling
     frustrumPositionUniform.setValue(camera.position);
@@ -72,15 +69,14 @@ void TerrainRenderer::render() {
     rightPlaneUniform.setValue(camera.rightPlane);
     upPlaneUniform.setValue(camera.upPlane);
     downPlaneUniform.setValue(camera.downPlane);
-    paramsBuffer.clearData(0, 4);
-    ShaderBuffer frustrumCullingBuffers[] = { meshDataBuffer, StorageBuffer(1, commandsBuffer), CountersBuffer(0, paramsBuffer) };
-    frustrumCulling.dispatch(workGroups, 1, 1, frustrumCullingBuffers, 3);
-    memoryBarrier(MemoryBarrier::storage | MemoryBarrier::indirectCommand);
+    ShaderBuffer frustrumCullingBuffers[] = { meshDataBuffer, StorageBuffer(1, commandsBuffer) };
+    frustrumCulling.dispatch(workGroups, 1, 1, frustrumCullingBuffers, 2);
+    memoryBarrier(MemoryBarrier::instances | MemoryBarrier::indirectCommand);
 
     // Draw
     graphicsPositionUniform.setValue(camera.position);
     vpMatrixUniform.setValue(camera.vpMatrix);
-    renderIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandsBuffer, 0, paramsBuffer, 0, meshData.size());
+    renderIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandsBuffer, 0, meshData.size());
 }
 
 
@@ -91,5 +87,4 @@ void TerrainRenderer::dispose() {
     vertexArray.dispose();
     frustrumCulling.dispose();
     meshDataBuffer.dispose();
-    paramsBuffer.dispose();
 }

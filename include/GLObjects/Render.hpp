@@ -28,6 +28,7 @@ enum class GeometryMode : GLenum {
 
 enum class MemoryBarrier : GLbitfield {
     vertices = GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT,
+    instances = GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT,
     indices = GL_ELEMENT_ARRAY_BARRIER_BIT,
     uniform = GL_UNIFORM_BARRIER_BIT,
     textureFetch = GL_TEXTURE_FETCH_BARRIER_BIT,
