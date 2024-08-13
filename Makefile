@@ -9,7 +9,7 @@ OPTI=-O2
 
 
 bin/VoxelTerrain: $(OBJ) obj/glad.o
-	@g++ -Wall $^ $(OPTI) -o $@ -lglfw3
+	@g++ -Wall $^ $(OPTI) -o $@ -lglfw
 	@cp shaders/* bin/shaders
 
 debug/VoxelTerrain: $(DEBUG_OBJ) obj/glad.o
