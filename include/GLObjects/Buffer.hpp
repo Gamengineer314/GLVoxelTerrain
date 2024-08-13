@@ -345,8 +345,6 @@ public:
 class ParametersBuffer : public Buffer {
 
 public:
-    int stride;
-
     /**
      * @brief Create a new parameters buffer
      * @param stride Size of an element in the buffer (in bytes)
