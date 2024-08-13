@@ -83,7 +83,7 @@ void Buffer::modifyData(void* data, uint32_t offset, uint32_t size) {
 
 void* Buffer::getData(uint32_t offset, uint32_t size) {
     bind();
-    void* data = new char[size];
+    void* data = new char[size * stride];
     glGetBufferSubData(bufferTargets[target], offset * stride, size * stride, data);
     return data;
 }

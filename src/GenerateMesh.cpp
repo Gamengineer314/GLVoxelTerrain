@@ -104,9 +104,9 @@ void generateBinarySolidBlocks(uint32_t chunkX, uint32_t chunkZ, int startY, int
             for (uint32_t i = IDIndexes[xzIndex]; i < IDIndexes[xzIndex + 1]; i += 2) { // Iter world y (only solid blocks in chunk)
                 int y = IDs[i] - startY;
                 if (y >= 0 && y < CHUNK_SIZE) {
-                    rows[y + z * CHUNK_SIZE] |= 1UL << x; // x
-                    rows[x + z * CHUNK_SIZE + CHUNK_SIZE * CHUNK_SIZE] |= 1UL << y; // y
-                    rows[y + x * CHUNK_SIZE + 2 * CHUNK_SIZE * CHUNK_SIZE] |= 1UL << z; // z
+                    rows[y + z * CHUNK_SIZE] |= (uint64_t)1 << x; // x
+                    rows[x + z * CHUNK_SIZE + CHUNK_SIZE * CHUNK_SIZE] |= (uint64_t)1 << y; // y
+                    rows[y + x * CHUNK_SIZE + 2 * CHUNK_SIZE * CHUNK_SIZE] |= (uint64_t)1 << z; // z
                 } 
                 else if (y == -1) ySide.x = true;
                 else if (y == CHUNK_SIZE) ySide.y = true;

@@ -2,7 +2,6 @@
 
 #include <cstdio>
 #include <cstring>
-#include <cmath>
 #include <iostream>
 #if defined(_WIN32)
 #include <Windows.h>

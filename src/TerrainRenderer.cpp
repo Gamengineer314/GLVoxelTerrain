@@ -59,7 +59,7 @@ void TerrainRenderer::prepareRender() {
     commandsBuffer.setDataUnique(commands, meshData.size(), UniqueBufferUsage::none);
     delete[] commands;
     meshDataBuffer.setDataUnique(meshData.data(), meshData.size(), UniqueBufferUsage::none);
-    paramsBuffer.setDataUnique(nullptr, 1, UniqueBufferUsage::none);
+    paramsBuffer.setDataUnique(nullptr, 1, UniqueBufferUsage::dynamicStorage);
 }
 
 
@@ -71,7 +71,8 @@ void TerrainRenderer::render() {
     rightPlaneUniform.setValue(camera.rightPlane);
     upPlaneUniform.setValue(camera.upPlane);
     downPlaneUniform.setValue(camera.downPlane);
-    paramsBuffer.clearData(0, 1);
+    uint32_t zero = 0;
+    paramsBuffer.modifyData(&zero, 0, 1);
     ShaderBuffer frustrumCullingBuffers[] = { meshDataBuffer, StorageBuffer(commandsBuffer, 1, sizeof(IndirectDrawArgs)), CountersBuffer(paramsBuffer, 0, sizeof(uint32_t)) };
     frustrumCulling.dispatch(workGroups, 1, 1, frustrumCullingBuffers, 3);
     memoryBarrier(MemoryBarrier::instances | MemoryBarrier::indirectCommand);
