@@ -85,7 +85,7 @@ public:
     **/
     void dispose();
 
-public:
+protected:
     GLuint program;
 
     /**

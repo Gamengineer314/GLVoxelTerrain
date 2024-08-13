@@ -1,6 +1,6 @@
-GLAD_C=/usr/src/glad.c
+GLAD_C=/usr/src/glad/glad.c
 
-INCLUDES=-I./ -I./include
+INCLUDES=-I. -I./include
 SOURCES=$(shell find -name "*.cpp")
 OBJ=$(patsubst ..%.cpp,obj/%.o,$(subst /,.,$(SOURCES)))
 DEBUG_OBJ=$(OBJ:obj/%=debug/%)
@@ -9,7 +9,7 @@ OPTI=-O2
 
 
 bin/VoxelTerrain: $(OBJ) obj/glad.o
-	@g++ -Wall $^ $(OPTI) -o $@ -lglfw
+	@g++ -Wall $^ $(OPTI) -o $@ -lglfw3
 	@cp shaders/* bin/shaders
 
 debug/VoxelTerrain: $(DEBUG_OBJ) obj/glad.o
@@ -22,8 +22,8 @@ valgrind: debug/VoxelTerrain
 	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./$<
 
 clean:
-	@find . -type f -name '*.o' -delete
-	@find . -type f -name '*.d' -delete
+	@find . -name '*.o' -delete
+	@find . -name '*.d' -delete
 	@rm -f bin/VoxelTerrain debug/VoxelTerrain
 	@rm -f bin/shaders/*.glsl
 

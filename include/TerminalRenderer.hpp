@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-using namespace std;
+using std::vector, std::string;
 
 
 class TerminalRenderer {
@@ -25,7 +25,7 @@ public:
          * @brief Update the component
          * @param lines New component text
         **/
-        void update(const string* lines);
+        void update(const std::string* lines);
 
     private:
         TerminalRenderer& renderer;
@@ -46,7 +46,7 @@ public:
 
 private:
     FILE* output;
-    vector<char> lines;
+    std::vector<char> lines;
     int lineCount;
     int width;
 
@@ -63,7 +63,7 @@ private:
      * @param lineStart Line start of the component
      * @param lineSize Number of lines of the component
     **/
-    void updateComponent(const string* componentLines, int lineStart, int lineSize);
+    void updateComponent(const std::string* componentLines, int lineStart, int lineSize);
 
 };
 

@@ -135,8 +135,8 @@ public:
 
     /**
      * @brief Get a part of the buffer
-     * @param offset First element to modify
-     * @param size Number of elements to modify
+     * @param offset First element to get
+     * @param size Number of elements to get
      * @return Pointer to the data (must be deallocated after use)
     **/
     void* getData(uint32_t offset, uint32_t size);
@@ -158,7 +158,7 @@ public:
     **/
     void dispose();
 
-public:
+protected:
     GLuint buffer;
     int target;
 

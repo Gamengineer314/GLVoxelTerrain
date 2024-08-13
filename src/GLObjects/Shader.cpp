@@ -1,7 +1,7 @@
 #include "GLObjects/Shader.hpp"
 
-#include <iostream>
 #include <fstream>
+#include <sstream>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -23,17 +23,15 @@ Shader::Shader() :
 void Shader::attachShader(const char* path, ShaderType type) {
     // Read file
     ifstream file = ifstream(path);
-    file.seekg(0, ios::end);
-    size_t size = file.tellg();
-    char* shaderCode = new char[size + 1];
-    file.seekg(0);
-    file.read(shaderCode, size);
-    shaderCode[size] = 0;
+    stringstream stream;
+    stream << file.rdbuf();
+    string str = stream.str();
+    const char* shaderCode = str.c_str();
+    file.close();
 
     // Compile and attach shader
     GLuint shader = glCreateShader((GLenum)type);
     glShaderSource(shader, 1, &shaderCode, nullptr);
-    delete[] shaderCode;
     glCompileShader(shader);
     glAttachShader(program, shader);
     glDeleteShader(shader);

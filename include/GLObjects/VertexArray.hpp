@@ -173,7 +173,7 @@ public:
     **/
     void dispose();
 
-public:
+private:
     GLuint array;
 
 };
