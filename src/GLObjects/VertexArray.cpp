@@ -1,5 +1,6 @@
 #include "GLObjects/VertexArray.hpp"
 
+#include <cstdint>
 #include <glad/glad.h>
 
 #include "GLObjects/Buffer.hpp"
@@ -14,62 +15,62 @@ VertexArray::VertexArray() {
 }
 
 
-void VertexArray::setVerticesFloat(int index, VerticesBuffer buffer, FloatAttributeType type, int size, int stride, int offset) {
+void VertexArray::setVerticesFloat(int index, VerticesBuffer buffer, FloatAttributeType type, int size, int offset) {
     bind();
     buffer.bind();
-    glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, buffer.stride, reinterpret_cast<void*>(offset));
     glEnableVertexAttribArray(index);
 }
 
-void VertexArray::setVerticesDouble(int index, VerticesBuffer buffer, int size, int stride, int offset) {
+void VertexArray::setVerticesDouble(int index, VerticesBuffer buffer, int size, int offset) {
     bind();
     buffer.bind();
-    glVertexAttribLPointer(index, size, GL_DOUBLE, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribLPointer(index, size, GL_DOUBLE, buffer.stride, reinterpret_cast<void*>(offset));
     glEnableVertexAttribArray(index);
 }
 
-void VertexArray::setVerticesInt(int index, VerticesBuffer buffer, IntAttributeType type, int size, int stride, int offset) {
+void VertexArray::setVerticesInt(int index, VerticesBuffer buffer, IntAttributeType type, int size, int offset) {
     bind();
     buffer.bind();
-    glVertexAttribIPointer(index, size, (GLenum)type, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribIPointer(index, size, (GLenum)type, buffer.stride, reinterpret_cast<void*>(offset));
     glEnableVertexAttribArray(index);
 }
 
-void VertexArray::setVerticesToFloat(int index, VerticesBuffer buffer, ToFloatAttributeType type, int size, int stride, int offset, bool normalize) {
+void VertexArray::setVerticesToFloat(int index, VerticesBuffer buffer, ToFloatAttributeType type, int size, int offset, bool normalize) {
     bind();
     buffer.bind();
-    glVertexAttribPointer(index, size, (GLenum)type, normalize ? GL_TRUE : GL_FALSE, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribPointer(index, size, (GLenum)type, normalize ? GL_TRUE : GL_FALSE, buffer.stride, reinterpret_cast<void*>(offset));
     glEnableVertexAttribArray(index);
 }
 
-void VertexArray::setInstancesFloat(int index, InstancesBuffer buffer, FloatAttributeType type, int size, int stride, int offset, int divisor) {
+void VertexArray::setInstancesFloat(int index, InstancesBuffer buffer, FloatAttributeType type, int size, int offset, int divisor) {
     bind();
     buffer.bind();
-    glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribPointer(index, size, (GLenum)type, GL_FALSE, buffer.stride, reinterpret_cast<void*>(offset));
     glVertexAttribDivisor(index, divisor);
     glEnableVertexAttribArray(index);
 }
 
-void VertexArray::setInstancesDouble(int index, InstancesBuffer buffer, int size, int stride, int offset, int divisor) {
+void VertexArray::setInstancesDouble(int index, InstancesBuffer buffer, int size, int offset, int divisor) {
     bind();
     buffer.bind();
-    glVertexAttribLPointer(index, size, GL_DOUBLE, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribLPointer(index, size, GL_DOUBLE, buffer.stride, reinterpret_cast<void*>(offset));
     glVertexAttribDivisor(index, divisor);
     glEnableVertexAttribArray(index);
 }
 
-void VertexArray::setInstancesInt(int index, InstancesBuffer buffer, IntAttributeType type, int size, int stride, int offset, int divisor) {
+void VertexArray::setInstancesInt(int index, InstancesBuffer buffer, IntAttributeType type, int size, int offset, int divisor) {
     bind();
     buffer.bind();
-    glVertexAttribIPointer(index, size, (GLenum)type, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribIPointer(index, size, (GLenum)type, buffer.stride, reinterpret_cast<void*>(offset));
     glVertexAttribDivisor(index, divisor);
     glEnableVertexAttribArray(index);
 }
 
-void VertexArray::setInstancesToFloat(int index, InstancesBuffer buffer, ToFloatAttributeType type, int size, int stride, int offset, bool normalize, int divisor) {
+void VertexArray::setInstancesToFloat(int index, InstancesBuffer buffer, ToFloatAttributeType type, int size, int offset, bool normalize, int divisor) {
     bind();
     buffer.bind();
-    glVertexAttribPointer(index, size, (GLenum)type, normalize ? GL_TRUE : GL_FALSE, stride, reinterpret_cast<void*>(offset));
+    glVertexAttribPointer(index, size, (GLenum)type, normalize ? GL_TRUE : GL_FALSE, buffer.stride, reinterpret_cast<void*>(offset));
     glVertexAttribDivisor(index, divisor);
     glEnableVertexAttribArray(index);
 }
@@ -88,7 +89,7 @@ void VertexArray::removeInstancesAttribute(int index) {
 
 
 void VertexArray::setIndices(IndicesBuffer buffer, IndexType indexType) {
-    this->indexType = indexType;
+    this->indexType = (int)indexType;
     indexed = true;
     bind();
     buffer.bind();

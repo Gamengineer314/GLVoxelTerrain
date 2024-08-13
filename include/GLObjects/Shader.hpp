@@ -85,7 +85,7 @@ public:
     **/
     void dispose();
 
-protected:
+public:
     GLuint program;
 
     /**
@@ -120,7 +120,7 @@ public:
      * @brief Create a new compute shader
      * @param path Path to the compute shader file
     **/
-    ComputeShader(const char* path);
+    explicit ComputeShader(const char* path);
 
     /**
      * @brief Dispatch the compute shader

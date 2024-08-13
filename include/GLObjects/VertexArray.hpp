@@ -43,19 +43,12 @@ enum class ToFloatAttributeType : GLenum {
 };
 
 
-enum class IndexType : GLenum {
-    uint8 = GL_UNSIGNED_BYTE,
-    uint16 = GL_UNSIGNED_SHORT,
-    uint32 = GL_UNSIGNED_INT,
-};
-
-
 
 class VertexArray {
 
 public:
     bool indexed = false;
-    IndexType indexType;
+    int indexType;
 
     /**
      * @brief Create a new vertex array object (VAO)
@@ -68,20 +61,18 @@ public:
      * @param buffer The vertices buffer the attribute is stored in
      * @param type Data type of the attribute in the buffer
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
     **/
-    void setVerticesFloat(int index, VerticesBuffer buffer, FloatAttributeType type, int size, int stride, int offset);
+    void setVerticesFloat(int index, VerticesBuffer buffer, FloatAttributeType type, int size, int offset);
 
     /**
      * @brief Add a vertices double attribute from a vertices buffer
      * @param index Index of the attribute
      * @param buffer The vertices buffer the attribute is stored in
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
     **/
-    void setVerticesDouble(int index, VerticesBuffer buffer, int size, int stride, int offset);
+    void setVerticesDouble(int index, VerticesBuffer buffer, int size, int offset);
 
     /**
      * @brief Add a vertices integer attribute from a vertices buffer
@@ -89,10 +80,9 @@ public:
      * @param buffer The vertices buffer the attribute is stored in
      * @param type Data type of the attribute in the buffer
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
     **/
-    void setVerticesInt(int index, VerticesBuffer buffer, IntAttributeType type, int size, int stride, int offset);
+    void setVerticesInt(int index, VerticesBuffer buffer, IntAttributeType type, int size, int offset);
 
     /**
      * @brief Add a vertices float attribute converted from a vertices buffer containing any type
@@ -100,11 +90,10 @@ public:
      * @param buffer The vertices buffer the attribute is stored in
      * @param type Data type of the attribute in the buffer
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
      * @param normalize Whether to normalize the attribute when converting to a float
     **/
-    void setVerticesToFloat(int index, VerticesBuffer buffer, ToFloatAttributeType type, int size, int stride, int offset, bool normalize);
+    void setVerticesToFloat(int index, VerticesBuffer buffer, ToFloatAttributeType type, int size, int offset, bool normalize);
 
     /**
      * @brief Add an instances float attribute from a vertices buffer
@@ -112,22 +101,20 @@ public:
      * @param buffer The vertices buffer the attribute is stored in
      * @param type Data type of the attribute in the buffer
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
      * @param divisor Number of instances that share the same attribute
     **/
-    void setInstancesFloat(int index, InstancesBuffer buffer, FloatAttributeType type, int size, int stride, int offset, int divisor = 1);
+    void setInstancesFloat(int index, InstancesBuffer buffer, FloatAttributeType type, int size, int offset, int divisor = 1);
 
     /**
      * @brief Add a vertices double attribute from a vertices buffer
      * @param index Index of the attribute
      * @param buffer The vertices buffer the attribute is stored in
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
      * @param divisor Number of instances that share the same attribute
     **/
-    void setInstancesDouble(int index, InstancesBuffer buffer, int size, int stride, int offset, int divisor = 1);
+    void setInstancesDouble(int index, InstancesBuffer buffer, int size, int offset, int divisor = 1);
 
     /**
      * @brief Add a vertices integer attribute from a vertices buffer
@@ -135,11 +122,10 @@ public:
      * @param buffer The vertices buffer the attribute is stored in
      * @param type Data type of the attribute in the buffer
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
      * @param divisor Number of instances that share the same attribute
     **/
-    void setInstancesInt(int index, InstancesBuffer buffer, IntAttributeType type, int size, int stride, int offset, int divisor = 1);
+    void setInstancesInt(int index, InstancesBuffer buffer, IntAttributeType type, int size, int offset, int divisor = 1);
 
     /**
      * @brief Add a vertices float attribute converted from a vertices buffer containing any type
@@ -147,12 +133,11 @@ public:
      * @param buffer The vertices buffer the attribute is stored in
      * @param type Data type of the attribute in the buffer
      * @param size Number of components of the attribute
-     * @param stride Size of the attribute (in bytes)
      * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
      * @param normalize Whether to normalize the attribute when converting to a float
      * @param divisor Number of instances that share the same attribute
     **/
-    void setInstancesToFloat(int index, InstancesBuffer buffer, ToFloatAttributeType type, int size, int stride, int offset, bool normalize, int divisor = 1);
+    void setInstancesToFloat(int index, InstancesBuffer buffer, ToFloatAttributeType type, int size, int offset, bool normalize, int divisor = 1);
 
     /**
      * @brief Remove a vertices attribute
@@ -188,7 +173,7 @@ public:
     **/
     void dispose();
 
-private:
+public:
     GLuint array;
 
 };

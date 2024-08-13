@@ -29,7 +29,8 @@ using namespace glm;
 
 #define WINDOW_WIDTH 1920
 #define WINDOW_HEIGHT 1080
-#define TITLE "Voxel Engine"
+#define TITLE "Voxel Terrain"
+#define BACKGROUND_COLOR 0, 0.8, 1.0
 
 
 int main() {
@@ -64,7 +65,7 @@ int main() {
 
         // Update
         controller.update(deltaTime);
-        renderBackground(0, 0.8, 1.0);
+        renderBackground(BACKGROUND_COLOR);
         renderer.render();
         fpsCounter.update(deltaTime);
         terminal.render();

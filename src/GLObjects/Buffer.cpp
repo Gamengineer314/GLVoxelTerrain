@@ -1,14 +1,14 @@
 #include "GLObjects/Buffer.hpp"
 
 #include <vector>
-#include <cstddef>
+#include <cstdint>
 #include <glad/glad.h>
 
 using namespace std;
 
 
 
-static GLenum bufferTargets[] = {
+GLenum bufferTargets[] = {
     GL_SHADER_STORAGE_BUFFER,
     GL_UNIFORM_BUFFER,
     GL_ATOMIC_COUNTER_BUFFER,
@@ -27,6 +27,21 @@ static GLenum bufferTargets[] = {
     GL_COPY_WRITE_BUFFER
 };
 
+
+GLenum indexTypes[] = {
+    GL_UNSIGNED_BYTE,
+    GL_UNSIGNED_SHORT,
+    GL_UNSIGNED_INT
+};
+
+int indexSizes[] = {
+    1,
+    2,
+    4
+};
+
+
+
 static GLuint boundBuffers[16] = { 
     (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, 
     (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1 
@@ -35,47 +50,49 @@ static vector<GLuint> shaderBoundBuffers[4] = { vector<GLuint>() };
 
 
 
-Buffer::Buffer(BufferTarget target) : 
+Buffer::Buffer(BufferTarget target, int stride) : 
+    stride(stride),
     target((int)target) {
     glGenBuffers(1, &buffer);
 }
 
-Buffer::Buffer(Buffer buffer, BufferTarget target) :
+Buffer::Buffer(Buffer buffer, BufferTarget target, int stride) :
+    stride(stride),
     buffer(buffer.buffer),
     target((int)target) {
 }
 
 
-void Buffer::setData(void* data, size_t size, BufferUsage usage) {
+void Buffer::setData(void* data, uint32_t size, BufferUsage usage) {
     bind();
-    glBufferData(bufferTargets[target], size, data, (GLenum)usage);
+    glBufferData(bufferTargets[target], size * stride, data, (GLenum)usage);
 }
 
 
-void Buffer::setDataUnique(void* data, size_t size, UniqueBufferUsage usage) {
+void Buffer::setDataUnique(void* data, uint32_t size, UniqueBufferUsage usage) {
     bind();
-    glBufferStorage(bufferTargets[target], size, data, (GLbitfield)usage);
+    glBufferStorage(bufferTargets[target], size * stride, data, (GLbitfield)usage);
 }
 
 
-void Buffer::modifyData(void* data, size_t offset, size_t size) {
+void Buffer::modifyData(void* data, uint32_t offset, uint32_t size) {
     bind();
-    glBufferSubData(bufferTargets[target], offset, size, data);
+    glBufferSubData(bufferTargets[target], offset * stride, size * stride, data);
 }
 
 
-void* Buffer::getData(size_t offset, size_t size) {
+void* Buffer::getData(uint32_t offset, uint32_t size) {
     bind();
     void* data = new char[size];
-    glGetBufferSubData(bufferTargets[target], offset, size, data);
+    glGetBufferSubData(bufferTargets[target], offset * stride, size * stride, data);
     return data;
 }
 
 
-void Buffer::clearData(size_t offset, size_t size) {
+void Buffer::clearData(uint32_t offset, uint32_t size) {
     bind();
     char zero = 0;
-    glClearBufferSubData(bufferTargets[target], GL_R8, offset, size, GL_RED, GL_UNSIGNED_BYTE, &zero);
+    glClearBufferSubData(bufferTargets[target], GL_R8, offset * stride, size * stride, GL_RED, GL_UNSIGNED_BYTE, &zero);
 }
 
 
@@ -102,14 +119,14 @@ static void addShaderBinding(int target, int binding) {
     }
 }
 
-ShaderBuffer::ShaderBuffer(int binding, BufferTarget target) :
-    Buffer(target), 
+ShaderBuffer::ShaderBuffer(BufferTarget target, int binding, int stride) :
+    Buffer(target, stride), 
     binding(binding) {
     addShaderBinding((int)target, binding);
 }
 
-ShaderBuffer::ShaderBuffer(int binding, Buffer buffer, BufferTarget target) :
-    Buffer(buffer, target), 
+ShaderBuffer::ShaderBuffer(Buffer buffer, BufferTarget target, int binding, int stride) :
+    Buffer(buffer, target, stride), 
     binding(binding) {
     addShaderBinding((int)target, binding);
 }

@@ -68,6 +68,36 @@ void renderBackground(float r, float g, float b);
 
 
 /**
+ * @brief Draw call
+ * @param mode Geometry to draw
+ * @param shader Shader to use
+ * @param VertexArray Vertex array to use
+ * @param first Index of the first vertex or index to draw
+ * @param count Number of vertices to draw
+ * @param baseVertex Index of the first vertex to draw for indexed rendering (ignored otherwise)
+ * @param shaderBuffers Shader buffers to use
+ * @param numShaderBuffers Number of elements in shaderBuffers
+**/
+void render(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, uint32_t first, uint32_t count, uint32_t baseVertex, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
+
+
+/**
+ * @brief Instanced draw call
+ * @param geometryMode Geometry to draw
+ * @param shader Shader to use
+ * @param vertexArray Vertex array to use
+ * @param first Index of the first vertex or index to draw
+ * @param count Number of vertices to draw
+ * @param baseVertex Index of the first vertex to draw for indexed rendering (ignored otherwise)
+ * @param baseInstance Index of the first instance
+ * @param instanceCount Number of instances to draw
+ * @param shaderBuffers Shader buffers to use
+ * @param numShaderBuffers Number of elements in shaderBuffers
+**/
+void renderInstanced(GeometryMode geometryMode, GraphicsShader shader, VertexArray vertexArray, uint32_t first, uint32_t count, uint32_t baseVertex, uint32_t baseInstance, uint32_t instanceCount, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
+
+
+/**
  * @brief Indirect draw call with commands provided in a buffer
  * @param geometryMode Geometry to draw
  * @param shader Shader to use
