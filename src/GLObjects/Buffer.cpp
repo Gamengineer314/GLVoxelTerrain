@@ -91,8 +91,7 @@ void* Buffer::getData(uint32_t offset, uint32_t size) {
 
 void Buffer::clearData(uint32_t offset, uint32_t size) {
     bind();
-    char zero = 0;
-    glClearBufferSubData(bufferTargets[target], GL_R8, offset * stride, size * stride, GL_RED, GL_UNSIGNED_BYTE, &zero);
+    glClearBufferSubData(bufferTargets[target], GL_R32UI, offset * stride, size * stride, GL_RED_INTEGER, GL_UNSIGNED_INT, nullptr);
 }
 
 
