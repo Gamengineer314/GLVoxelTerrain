@@ -144,7 +144,7 @@ public:
     /**
      * @brief Set a part of the buffer to zero
      * @param offset First element to modify
-     * @param size Number of elements to modify
+     * @param size Number of elements to modify (size * stride must be a multiple of 4 bytes)
      */
     void clearData(uint32_t offset, uint32_t size);
 
