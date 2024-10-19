@@ -52,7 +52,7 @@ enum class BufferTarget : int { // GLenum
 extern GLenum bufferTargets[16];
 
 
-enum class IndexType : GLenum {
+enum class IndexType : int {
     uint8 = 0, // GL_UNSIGNED_BYTE
     uint16 = 1, // GL_UNSIGNED_SHORT
     uint32 = 2, // GL_UNSIGNED_INT

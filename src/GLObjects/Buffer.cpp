@@ -46,7 +46,7 @@ static GLuint boundBuffers[16] = {
     (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, 
     (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1, (GLuint)-1 
 };
-static vector<GLuint> shaderBoundBuffers[4] = { vector<GLuint>() };
+static vector<GLuint> shaderBoundBuffers[4] = { vector<GLuint>(), vector<GLuint>(), vector<GLuint>(), vector<GLuint>() };
 
 
 
