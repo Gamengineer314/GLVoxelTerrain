@@ -1,44 +1,56 @@
+NAME=VoxelTerrain
+INCLUDES=-Iinclude
+SOURCES=$(shell find src -name "*.cpp")
+OBJ=$(SOURCES:src/%.cpp=obj/%.o)
+DEBUG_OBJ=$(OBJ:obj/%=debug/%)
+DIRECTORIES=$(sort $(dir $(OBJ) $(DEBUG_OBJ))) bin/ bin/shaders/
+DEPENDENCIES=$(OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
+LIBRARIES=-lglfw
+OPTI=-O2
 GLAD_C=/usr/src/glad/glad.c
 
-INCLUDES=-I. -I./include
-SOURCES=$(shell find -name "*.cpp")
-OBJ=$(patsubst ..%.cpp,obj/%.o,$(subst /,.,$(SOURCES)))
-DEBUG_OBJ=$(OBJ:obj/%=debug/%)
-DEPENDENCIES=$(OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
-OPTI=-O2
+
+bin: $(DIRECTORIES) bin/$(NAME)
+
+debug: $(DIRECTORIES) debug/$(NAME)
 
 
-bin/VoxelTerrain: $(OBJ) obj/glad.o
-	@g++ -Wall $^ $(OPTI) -o $@ -lglfw
+bin/$(NAME): $(OBJ) obj/glad.o
+	@echo "Linking..."
+	@g++ -Wall $^ $(OPTI) -o $@ $(LIBRARIES)
 	@cp shaders/* bin/shaders
 
-debug/VoxelTerrain: $(DEBUG_OBJ) obj/glad.o
-	@g++ -Wall $^ -g -o $@ -lglfw
+debug/$(NAME): $(DEBUG_OBJ) obj/glad.o
+	@echo "Linking (debug)..."
+	@g++ -Wall $^ -g -o $@ $(LIBRARIES)
 
-run: bin/VoxelTerrain
-	@$<
-
-valgrind: debug/VoxelTerrain
-	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./$<
-
-clean:
-	@find . -name '*.o' -delete
-	@find . -name '*.d' -delete
-	@rm -f bin/VoxelTerrain debug/VoxelTerrain
-	@rm -f bin/shaders/*.glsl
-
-.PHONY: run valgrind clean
-
-
-.SECONDEXPANSION:
-
-$(OBJ): $$(patsubst obj/%/o,%.cpp,$$(subst .,/,$$@))
+obj/%.o: src/%.cpp
+	@echo "Compiling $*..."
 	@g++ -Wall -c $< $(INCLUDES) $(OPTI) -o $@ -MMD -MP -MF $(@:.o=.d)
 
-$(DEBUG_OBJ): $$(patsubst debug/%/o,%.cpp,$$(subst .,/,$$@))
+debug/%.o: src/%.cpp
+	@echo "Compiling $* (debug)..."
 	@g++ -Wall -c $< $(INCLUDES) -g -o $@ -MMD -MP -MF $(@:.o=.d)
 
 obj/glad.o: $(GLAD_C)
-	@gcc -c $< $(OPTI) -o $@
+	@echo "Compiling glad..."
+	@g++ -c $< $(OPTI) -o $@
+
+%/: 
+	@mkdir -p $@
+
+
+run: bin
+	@echo "Running..."
+	@./bin/$(NAME)
+
+valgrind: debug
+	@valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes -s ./debug/$(NAME)
+
+clean:
+	@rm -fr bin/* obj/* debug/*
+
+
+.PHONY: bin debug run valgrind clean
 
 include $(wildcard $(DEPENDENCIES))
