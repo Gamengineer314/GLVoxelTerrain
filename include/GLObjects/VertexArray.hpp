@@ -78,9 +78,11 @@ public:
      * @param buffer The buffer
      * @param stride Size of an element in the buffer
      * @param start First element to use
+     * @param instances 0 for a vertex buffer, 1 for an instance buffer, > 1 to specify the number of instances that share the same attribute
     **/
-    void setBuffer(uint32_t index, const Buffer& buffer, uint32_t stride, uint32_t start = 0) const {
+    void setBuffer(uint32_t index, const Buffer& buffer, uint32_t stride, uint32_t start = 0, uint32_t instances = 0) const {
         glVertexArrayVertexBuffer(array, index, buffer.id(), start * stride, stride);
+        if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
     }
 
     /**
@@ -98,12 +100,10 @@ public:
      * @param type Attribute type
      * @param components Number of components
      * @param offset Offset of the attribute in its buffer
-     * @param instances 0 for a vertex attribute, 1 for an instance attribute, > 1 to specify the number of instances that share the same attribute
      * @param enabled Whether the attribute is enabled
     **/
-    void setAttributeFormat(uint32_t index, IntAttributeType type, uint32_t components = 1, uint32_t offset = 0, uint32_t instances = 0, bool enabled = true) const {
+    void setAttributeFormat(uint32_t index, IntAttributeType type, uint32_t components = 1, uint32_t offset = 0, bool enabled = true) const {
         glVertexArrayAttribIFormat(array, index, components, (GLenum)type, offset);
-        if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
         if (enabled) enableAttribute(index);
     }
 
@@ -113,13 +113,11 @@ public:
      * @param type Attribute type
      * @param components Number of components
      * @param offset Offset of the attribute in its buffer
-     * @param instances 0 for a vertex attribute, 1 for an instance attribute, > 1 to specify the number of instances that share the same attribute
      * @param enabled Whether the attribute is enabled
     **/
-    void setAttributeFormat(uint32_t index, FloatAttributeType type, uint32_t components = 1, uint32_t offset = 0, uint32_t instances = 0, bool enabled = true) const {
+    void setAttributeFormat(uint32_t index, FloatAttributeType type, uint32_t components = 1, uint32_t offset = 0, bool enabled = true) const {
         if (type == FloatAttributeType::float64) glVertexArrayAttribLFormat(array, index, components, (GLenum)type, offset);
         else glVertexArrayAttribFormat(array, index, components, (GLenum)type, GL_FALSE, offset);
-        if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
         if (enabled) enableAttribute(index);
     }
 
@@ -130,12 +128,10 @@ public:
      * @param normalize Whether to normalize the attribute when converting to a float
      * @param components Number of components
      * @param offset Offset of the attribute in its buffer
-     * @param instances 0 for a vertex attribute, 1 for an instance attribute, > 1 to specify the number of instances that share the same attribute
      * @param enabled Whether the attribute is enabled
     **/
-    void setAttributeFormat(uint32_t index, ToFloatAttributeType type, bool normalize, uint32_t components = 1, uint32_t offset = 0, uint32_t instances = 0, bool enabled = true) const {
+    void setAttributeFormat(uint32_t index, ToFloatAttributeType type, bool normalize, uint32_t components = 1, uint32_t offset = 0, bool enabled = true) const {
         glVertexArrayAttribFormat(array, index, components, (GLenum)type, GL_FALSE, offset);
-        if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
         if (enabled) enableAttribute(index);
     }
 

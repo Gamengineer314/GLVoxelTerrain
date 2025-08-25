@@ -56,8 +56,8 @@ void TerrainRenderer::prepareRender() {
     paramsBuffer.setDataUnique<uint32_t>(nullptr, 1, UniqueBufferUsage::none);
 
     // Create vertex array
-    vertexArray.setBuffer(0, squaresBuffer, 2 * sizeof(uint32_t));
-    vertexArray.setAttributeFormat(0, IntAttributeType::uint32, 2, 0, 1);
+    vertexArray.setBuffer(0, squaresBuffer, 2 * sizeof(uint32_t), 0, 1);
+    vertexArray.setAttributeFormat(0, IntAttributeType::uint32, 2, 0);
     vertexArray.setAttributeBuffer(0, 0);
 }
 
