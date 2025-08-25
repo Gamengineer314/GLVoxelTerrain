@@ -1,13 +1,15 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include <vector>
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #include "GLObjects/Buffer.hpp"
 
+using namespace std;
 using namespace glm;
-
 
 
 enum class ShaderType : GLenum {
@@ -20,130 +22,165 @@ enum class ShaderType : GLenum {
 };
 
 
-
 class Shader {
 
 public:
-    class Uniform {
 
-    public:
-        /**
-         * @brief Create a new uniform
-         * @param shader Shader the uniform is in
-         * @param name Name of the uniform in the shader
-        **/
-        Uniform(Shader& shader, const char* name);
+    Shader() : program(glCreateProgram()) {}
 
-        /**
-         * @brief Set the value of the matrix uniform
-         * @param value The value to set the uniform to
-        **/
-        void setValue(mat4& value);
+    ~Shader() {
+        glDeleteProgram(program);
+    }
 
-        /**
-         * @brief Set the value of the vector uniform
-         * @param value The value to set the uniform to
-        **/
-        void setValue(vec3& value);
+    Shader(Shader&& other) : program(other.program) {
+        other.program = 0;
+    }
 
-        /**
-         * @brief Set the value of the vector uniform
-         * @param value The value to set the uniform to
-        **/
-        void setValue(vec4& value);
+    Shader& operator=(Shader&& other) {
+        if (this != &other) {
+            program = other.program;
+            other.program = 0;
+            other.shaderBuffers = move(shaderBuffers);
+        }
+        return *this;
+    }
 
-        /**
-         * @brief Set the value of the vector uniform
-         * @param value The value to set the uniform to
-        **/
-        void setValue(float value);
-
-    private:
-        Shader& shader;
-        GLint location;
-
-    };
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
 
     /**
-     * @brief Create a new empty shader program
+     * @brief Add or set a buffer in the shader
+     * @param index Index of the buffer
+     * @param type Buffer type
+     * @param buffer The buffer
     **/
-    Shader();
+    void setBuffer(uint32_t index, ShaderBufferType type, const Buffer& buffer);
+
+    /**
+     * @brief Get the buffers in the shader
+    **/
+    const vector<ShaderBuffer>& buffers() const {
+        return shaderBuffers;
+    }
 
     /**
      * @brief Use the shader for future OpenGL calls
     **/
-    void use();
+    void use() const {
+        glUseProgram(program);
+    }
 
     /**
-     * @brief Get a uniform by its name
-     * @param name Name of the uniform in the shader
+     * @brief Get the OpenGL program object
     **/
-    Uniform getUniform(const char* name);
-
-    /**
-     * @brief Delete the shader
-    **/
-    void dispose();
+    uint32_t id() const {
+        return program;
+    }
 
 protected:
+
     GLuint program;
+    vector<ShaderBuffer> shaderBuffers;
 
     /**
      * @brief Attach a new shader to the program
      * @param path Path to the shader file
      * @param type Shader type
     **/
-    void attachShader(const char* path, ShaderType type);
+    void attachShader(const char* path, ShaderType type) const;
 
 };
-
 
 
 class GraphicsShader : public Shader {
 
 public:
+
     /**
      * @brief Create a new shader for rendering
      * @param vertexPath Path to the vertex shader file
      * @param fragmentPath Path to the fragment shader file
     **/
-    GraphicsShader(const char* vertexPath, const char* fragmentPath);
+    GraphicsShader(const char* vertexPath, const char* fragmentPath) : Shader() {
+        attachShader(vertexPath, ShaderType::vertex);
+        attachShader(fragmentPath, ShaderType::fragment);
+        glLinkProgram(program);
+    }
 
 };
-
 
 
 class ComputeShader : public Shader {
 
 public:
+
     /**
      * @brief Create a new compute shader
      * @param path Path to the compute shader file
     **/
-    explicit ComputeShader(const char* path);
-
-    /**
-     * @brief Dispatch the compute shader
-     * @param numGroupsX Number of work groups in the X dimension
-     * @param numGroupsY Number of work groups in the Y dimension
-     * @param numGroupsZ Number of work groups in the Z dimension
-     * @param shaderBuffers Shader buffers to use
-     * @param numShaderBuffers Number of elements in shaderBuffers
-    **/
-    void dispatch(int numGroupsX, int numGroupsY, int numGroupsZ, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
-
-    /**
-     * @brief Dispatch the compute shader with commands provided as a buffer
-     * @param commands Indirect dispatch command(s)
-     * @param commandIndex Index of the command to use
-     * @param barrier Memory barrier to use
-     * @param shaderBuffers Shader buffers to use
-     * @param numShaderBuffers Number of elements in shaderBuffers
-    **/
-    void dispatchIndirect(IndirectDispatchBuffer commands, int commandIndex, ShaderBuffer* shaderBuffers = nullptr, int numShaderBuffers = 0);
+    explicit ComputeShader(const char* path) : Shader() {
+        attachShader(path, ShaderType::compute);
+        glLinkProgram(program);
+    }
 
 };
 
+
+class Uniform {
+
+public:
+    /**
+     * @brief Get a uniform in a shader
+     * @param shader The shader
+     * @param name Name of the uniform in the shader
+    **/
+    Uniform(Shader& shader, const char* name) : 
+        shader(shader), location(glGetUniformLocation(shader.id(), name)) {}
+
+    /**
+     * @brief Set the value of the matrix uniform
+     * @param value The value to set the uniform to
+    **/
+    void setValue(mat4& value) {
+        glProgramUniformMatrix4fv(shader.id(), location, 1, GL_FALSE, value_ptr(value));
+    }
+
+    /**
+     * @brief Set the value of the vector uniform
+     * @param value The value to set the uniform to
+    **/
+    void setValue(vec3& value) {
+        glProgramUniform3fv(shader.id(), location, 1, value_ptr(value));
+    }
+
+    /**
+     * @brief Set the value of the vector uniform
+     * @param value The value to set the uniform to
+    **/
+    void setValue(vec4& value) {
+        glProgramUniform4fv(shader.id(), location, 1, value_ptr(value));
+    }
+
+    /**
+     * @brief Set the value of the vector uniform
+     * @param value The value to set the uniform to
+    **/
+    void setValue(float value) {
+        glProgramUniform1f(shader.id(), location, value);
+    }
+
+    /**
+     * @brief Get the OpenGL uniform location
+    **/
+    int32_t id() {
+        return location;
+    }
+
+private:
+    Shader& shader;
+    GLint location;
+
+};
 
 
 #endif // SHADER_H

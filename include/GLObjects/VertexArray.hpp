@@ -6,7 +6,6 @@
 #include "GLObjects/Buffer.hpp"
 
 
-
 enum class IntAttributeType : GLenum {
     int8 = GL_BYTE,
     uint8 = GL_UNSIGNED_BYTE,
@@ -22,7 +21,7 @@ enum class FloatAttributeType : GLenum {
     float32 = GL_FLOAT,
     float64 = GL_DOUBLE,
     fixed32 = GL_FIXED,
-    fuint_10_11_11 = GL_UNSIGNED_INT_10F_11F_11F_REV
+    uint_10f_11f_11f = GL_UNSIGNED_INT_10F_11F_11F_REV
 };
 
 
@@ -33,148 +32,172 @@ enum class ToFloatAttributeType : GLenum {
     uint16 = GL_UNSIGNED_SHORT,
     int32 = GL_INT,
     uint32 = GL_UNSIGNED_INT,
-    float16 = GL_HALF_FLOAT,
-    float32 = GL_FLOAT,
-    float64 = GL_DOUBLE,
-    fixed32 = GL_FIXED,
     int_2_10_10_10 = GL_INT_2_10_10_10_REV,
-    uint_2_10_10_10 = GL_UNSIGNED_INT_2_10_10_10_REV,
-    fuint_10_11_11 = GL_UNSIGNED_INT_10F_11F_11F_REV
+    uint_2_10_10_10 = GL_UNSIGNED_INT_2_10_10_10_REV
 };
 
+
+enum class IndexType : GLenum {
+    uint8 = GL_UNSIGNED_BYTE,
+    uint16 = GL_UNSIGNED_SHORT,
+    uint32 = GL_UNSIGNED_INT,
+    none = 0
+};
 
 
 class VertexArray {
 
 public:
-    bool indexed = false;
-    int indexType;
+
+    VertexArray() {
+        glCreateVertexArrays(1, &array);
+    }
+
+    ~VertexArray() {
+        glDeleteVertexArrays(1, &array);
+    }
+
+    VertexArray(VertexArray&& other) : array(other.array) {
+        other.array = 0;
+    }
+
+    VertexArray& operator=(VertexArray&& other) {
+        if (this != &other) {
+            array = other.array;
+            other.array = 0;
+        }
+        return *this;
+    }
+
+    VertexArray(const VertexArray&) = delete;
+    VertexArray& operator=(const VertexArray&) = delete;
 
     /**
-     * @brief Create a new vertex array object (VAO)
+     * @brief Add or set a buffer in the array
+     * @param index Index of the buffer
+     * @param buffer The buffer
+     * @param stride Size of an element in the buffer
+     * @param start First element to use
     **/
-    VertexArray();
+    void setBuffer(uint32_t index, const Buffer& buffer, uint32_t stride, uint32_t start = 0) const {
+        glVertexArrayVertexBuffer(array, index, buffer.id(), start * stride, stride);
+    }
 
     /**
-     * @brief Add a vertices float attribute from a vertices buffer
-     * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param type Data type of the attribute in the buffer
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
+     * @brief Set the buffer where an attribute is stored
+     * @param attribute Index of the attribute
+     * @param buffer Index of the buffer
     **/
-    void setVerticesFloat(int index, VerticesBuffer buffer, FloatAttributeType type, int size, int offset);
+    void setAttributeBuffer(uint32_t attribute, uint32_t buffer) const {
+        glVertexArrayAttribBinding(array, attribute, buffer);
+    }
 
     /**
-     * @brief Add a vertices double attribute from a vertices buffer
+     * @brief Set the format of an integer attribute in the array
      * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
+     * @param type Attribute type
+     * @param components Number of components
+     * @param offset Offset of the attribute in its buffer
+     * @param instances 0 for a vertex attribute, 1 for an instance attribute, > 1 to specify the number of instances that share the same attribute
+     * @param enabled Whether the attribute is enabled
     **/
-    void setVerticesDouble(int index, VerticesBuffer buffer, int size, int offset);
+    void setAttributeFormat(uint32_t index, IntAttributeType type, uint32_t components = 1, uint32_t offset = 0, uint32_t instances = 0, bool enabled = true) const {
+        glVertexArrayAttribIFormat(array, index, components, (GLenum)type, offset);
+        if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
+        if (enabled) enableAttribute(index);
+    }
 
     /**
-     * @brief Add a vertices integer attribute from a vertices buffer
+     * @brief Set the format of a floating point attribute in the array
      * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param type Data type of the attribute in the buffer
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
+     * @param type Attribute type
+     * @param components Number of components
+     * @param offset Offset of the attribute in its buffer
+     * @param instances 0 for a vertex attribute, 1 for an instance attribute, > 1 to specify the number of instances that share the same attribute
+     * @param enabled Whether the attribute is enabled
     **/
-    void setVerticesInt(int index, VerticesBuffer buffer, IntAttributeType type, int size, int offset);
+    void setAttributeFormat(uint32_t index, FloatAttributeType type, uint32_t components = 1, uint32_t offset = 0, uint32_t instances = 0, bool enabled = true) const {
+        if (type == FloatAttributeType::float64) glVertexArrayAttribLFormat(array, index, components, (GLenum)type, offset);
+        else glVertexArrayAttribFormat(array, index, components, (GLenum)type, GL_FALSE, offset);
+        if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
+        if (enabled) enableAttribute(index);
+    }
 
     /**
-     * @brief Add a vertices float attribute converted from a vertices buffer containing any type
+     * @brief Set the format of a floating point attribute from integer data in the array
      * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param type Data type of the attribute in the buffer
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
+     * @param type Attribute type
      * @param normalize Whether to normalize the attribute when converting to a float
+     * @param components Number of components
+     * @param offset Offset of the attribute in its buffer
+     * @param instances 0 for a vertex attribute, 1 for an instance attribute, > 1 to specify the number of instances that share the same attribute
+     * @param enabled Whether the attribute is enabled
     **/
-    void setVerticesToFloat(int index, VerticesBuffer buffer, ToFloatAttributeType type, int size, int offset, bool normalize);
+    void setAttributeFormat(uint32_t index, ToFloatAttributeType type, bool normalize, uint32_t components = 1, uint32_t offset = 0, uint32_t instances = 0, bool enabled = true) const {
+        glVertexArrayAttribFormat(array, index, components, (GLenum)type, GL_FALSE, offset);
+        if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
+        if (enabled) enableAttribute(index);
+    }
 
     /**
-     * @brief Add an instances float attribute from a vertices buffer
+     * @brief Enable an attribute in the array
      * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param type Data type of the attribute in the buffer
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
-     * @param divisor Number of instances that share the same attribute
     **/
-    void setInstancesFloat(int index, InstancesBuffer buffer, FloatAttributeType type, int size, int offset, int divisor = 1);
+    void enableAttribute(uint32_t index) const {
+        glEnableVertexArrayAttrib(array, index);
+    }
 
     /**
-     * @brief Add a vertices double attribute from a vertices buffer
-     * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
-     * @param divisor Number of instances that share the same attribute
-    **/
-    void setInstancesDouble(int index, InstancesBuffer buffer, int size, int offset, int divisor = 1);
-
-    /**
-     * @brief Add a vertices integer attribute from a vertices buffer
-     * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param type Data type of the attribute in the buffer
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
-     * @param divisor Number of instances that share the same attribute
-    **/
-    void setInstancesInt(int index, InstancesBuffer buffer, IntAttributeType type, int size, int offset, int divisor = 1);
-
-    /**
-     * @brief Add a vertices float attribute converted from a vertices buffer containing any type
-     * @param index Index of the attribute
-     * @param buffer The vertices buffer the attribute is stored in
-     * @param type Data type of the attribute in the buffer
-     * @param size Number of components of the attribute
-     * @param offset Offset of the attribute in each vertex in the buffer (in bytes)
-     * @param normalize Whether to normalize the attribute when converting to a float
-     * @param divisor Number of instances that share the same attribute
-    **/
-    void setInstancesToFloat(int index, InstancesBuffer buffer, ToFloatAttributeType type, int size, int offset, bool normalize, int divisor = 1);
-
-    /**
-     * @brief Remove a vertices attribute
+     * @brief Disable an attribute in the array
      * @param index Index of the attribute
     **/
-    void removeVerticesAttribute(int index);
-
-    /**
-     * @brief Remove an instances attribute
-     * @param index Index of the attribute
-    **/
-    void removeInstancesAttribute(int index);
+    void disableAttribute(uint32_t index) const {
+        glDisableVertexArrayAttrib(array, index);
+    }
 
     /**
      * @brief Add an indices buffer to the array
-     * @param buffer The indices buffer to add
+     * @param buffer The buffer to add
      * @param indexType Data type of the indices
     **/
-    void setIndices(IndicesBuffer buffer, IndexType indexType);
+    void setIndices(const Buffer& buffer, IndexType indexType) {
+        glVertexArrayElementBuffer(array, buffer.id());
+        this->indexType = indexType;
+    }
 
     /**
      * @brief Remove the indices buffer
     **/
-    void removeIndices();
+    void removeIndices() {
+        glVertexArrayElementBuffer(array, 0);
+        indexType = IndexType::none;
+    }
 
     /**
      * @brief Use the array for future OpenGL calls
     **/
-    void bind();
+    void use() const {
+        glBindVertexArray(array);
+    }
 
     /**
-     * @brief Delete the array
+     * @brief Get the OpenGL buffer object
     **/
-    void dispose();
+    uint32_t id() const {
+        return array;
+    }
+
+    /**
+     * @brief Index type if the array is indexed, IndexType::none otherwise
+    **/
+    IndexType indices() const {
+        return indexType;
+    }
 
 private:
+
     GLuint array;
+    IndexType indexType = IndexType::none;
 
 };
 

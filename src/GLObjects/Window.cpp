@@ -19,11 +19,17 @@ Window::Window(int width, int height, const char* title, bool vsync) :
     // Create window
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-    window = glfwCreateWindow(width, height, "Voxel terrain", nullptr, nullptr);
+    window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (window == nullptr) throw runtime_error("glfwCreateWindow error");
     glfwMakeContextCurrent(window);
     if (!vsync) glfwSwapInterval(0);
     getCursorPosition(lastCursorX, lastCursorY);
+}
+
+
+Window::~Window() {
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 
@@ -49,39 +55,6 @@ void Window::update() {
 }
 
 
-bool Window::closed() {
-    return glfwWindowShouldClose(window);
-}
-
-
-bool Window::keyPressed(int key) {
-    return glfwGetKey(window, key) == GLFW_PRESS;
-}
-
-
-bool Window::mouseButtonPressed(int button) {
-    return glfwGetMouseButton(window, button) == GLFW_PRESS;
-}
-
-
-void Window::getCursorPosition(double& x, double& y) {
-    glfwGetCursorPos(window, &x, &y);
-}
-
-
-void Window::setCursorPosition(double x, double y) {
-    glfwSetCursorPos(window, x, y);
-}
-
-
-void Window::getCursorMovement(double& dx, double& dy) {
-    dx = cursorDx;
-    dy = cursorDy;
-    cursorDx = 0;
-    cursorDy = 0;
-}
-
-
 void Window::lockCursor() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     setCursorPosition(width / 2, height / 2);
@@ -94,10 +67,4 @@ void Window::lockCursor() {
 void Window::unlockCursor() {
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     locked = false;
-}
-
-
-void Window::dispose() {
-    glfwDestroyWindow(window);
-    glfwTerminate();
 }

@@ -7,7 +7,7 @@ DIRECTORIES=$(sort $(dir $(OBJ) $(DEBUG_OBJ))) bin/ bin/shaders/
 DEPENDENCIES=$(OBJ:%.o=%.d) $(DEBUG_OBJ:%.o=%.d)
 LIBRARIES=-lglfw
 OPTI=-O2
-GLAD_C=/usr/src/glad/glad.c
+GLAD_C=/usr/local/src/glad/glad.c
 
 
 bin: $(DIRECTORIES) bin/$(NAME)

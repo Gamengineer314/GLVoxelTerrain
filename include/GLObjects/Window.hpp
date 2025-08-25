@@ -20,6 +20,13 @@ public:
     **/
     Window(int width, int height, const char* title, bool vsync = false);
 
+    ~Window();
+
+    Window(Window&& other) = delete;
+    Window& operator=(Window&& other) = delete;
+    Window(const Window&) = delete;
+    Window& operator=(const Window&) = delete;
+
     /**
      * @brief Window update (must be called each frame)
     **/
@@ -28,40 +35,55 @@ public:
     /**
      * @brief Check if the window was closed
     **/
-    bool closed();
+    bool closed() {
+        return glfwWindowShouldClose(window);
+    }
 
     /**
      * @brief Check if a given key was pressed
      * @param key Key code of the key to check
     **/
-    bool keyPressed(int key);
+    bool keyPressed(int key) {
+        return glfwGetKey(window, key) == GLFW_PRESS;
+    }
 
     /**
      * @brief Check if a given mouse button was pressed
      * @param button Button code of the button to check
     **/
-    bool mouseButtonPressed(int button);
+    bool mouseButtonPressed(int button) {
+        return glfwGetMouseButton(window, button) == GLFW_PRESS;
+    }
 
     /**
      * @brief Get the cursor position
      * @param x x position (output)
      * @param y y position (output)
     **/
-    void getCursorPosition(double& x, double& y);
+    void getCursorPosition(double& x, double& y) {
+        glfwGetCursorPos(window, &x, &y);
+    }
 
     /**
      * @brief Set the cursor position
      * @param x x position
      * @param y y position
     **/
-    void setCursorPosition(double x, double y);
+    void setCursorPosition(double x, double y) {
+        glfwSetCursorPos(window, x, y);
+    }
 
     /**
      * @brief Get the movement of the cursor since the last call to this function
      * @param dx x movement (output)
      * @param dy y movement (output)
     **/
-    void getCursorMovement(double& dx, double& dy);
+    void getCursorMovement(double& dx, double& dy) {
+        dx = cursorDx;
+        dy = cursorDy;
+        cursorDx = 0;
+        cursorDy = 0;
+    }
 
     /**
      * @brief Lock and hide the cursor
@@ -72,11 +94,6 @@ public:
      * @brief Unlock and show the cursor
     **/
     void unlockCursor();
-
-    /**
-     * @brief Delete the window
-    **/
-    void dispose();
 
 private:
     GLFWwindow* window;

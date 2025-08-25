@@ -8,7 +8,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "GLObjects/Window.hpp"
-#include "GLObjects/Render.hpp"
+#include "GLObjects/Command.hpp"
 #include "GLObjects/Buffer.hpp"
 #include "GLObjects/VertexArray.hpp"
 #include "Camera.hpp"
@@ -45,15 +45,15 @@ int main() {
     delete[] IDIndexes;
     
     // Initialize objects
-    Window window = Window(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
-    renderInit(WINDOW_WIDTH, WINDOW_HEIGHT);
-    Camera camera = Camera(WINDOW_WIDTH, WINDOW_HEIGHT, 60, 0.1, 1500, vec3(2048, 100, 2048), 0, 0);
-    CameraController controller = CameraController(window, camera, WINDOW_WIDTH, WINDOW_HEIGHT);
-    TerrainRenderer renderer = TerrainRenderer(camera);
+    Window window(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
+    commandInit(WINDOW_WIDTH, WINDOW_HEIGHT);
+    Camera camera(WINDOW_WIDTH, WINDOW_HEIGHT, 60, 0.1, 1500, vec3(2048, 100, 2048), 0, 0);
+    CameraController controller(window, camera, WINDOW_WIDTH, WINDOW_HEIGHT);
+    TerrainRenderer renderer(camera);
     renderer.addMeshes(meshes, squares);
     renderer.prepareRender();
-    TerminalRenderer terminal = TerminalRenderer(stdout);
-    FPSCounter fpsCounter = FPSCounter(terminal);
+    TerminalRenderer terminal(stdout);
+    FPSCounter fpsCounter(terminal);
     
     // Main loop
     system_clock::time_point lastTime = system_clock::now();
@@ -65,13 +65,10 @@ int main() {
 
         // Update
         controller.update(deltaTime);
-        renderBackground(BACKGROUND_COLOR);
+        commandBackground(BACKGROUND_COLOR);
         renderer.render();
         fpsCounter.update(deltaTime);
         terminal.render();
         window.update();
     }
-
-    renderer.dispose();
-    window.dispose();
 }

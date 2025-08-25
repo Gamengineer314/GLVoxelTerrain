@@ -45,31 +45,26 @@ public:
     **/
     void render();
 
-    /**
-     * @brief Delete the terrain renderer
-    **/
-    void dispose();
-
 private:
     Camera& camera;
     GraphicsShader shader;
     vector<MeshData> meshData; // All meshes information (position, size, rectangles indices)
     vector<Square> squares; // All rectangles (position, width, height, normal)
-    InstancesBuffer squaresBuffer;
-    IndirectDrawBuffer commandsBuffer;
+    Buffer squaresBuffer;
+    Buffer commandsBuffer;
     VertexArray vertexArray;
-    Shader::Uniform graphicsPositionUniform;
-    Shader::Uniform vpMatrixUniform;
+    Uniform graphicsPositionUniform;
+    Uniform vpMatrixUniform;
 
     ComputeShader frustrumCulling;
-    StorageBuffer meshDataBuffer;
-    ParametersBuffer paramsBuffer;
-    Shader::Uniform frustrumPositionUniform;
-    Shader::Uniform farPlaneUniform;
-    Shader::Uniform leftPlaneUniform;
-    Shader::Uniform rightPlaneUniform;
-    Shader::Uniform upPlaneUniform;
-    Shader::Uniform downPlaneUniform;
+    Buffer meshDataBuffer;
+    Buffer paramsBuffer;
+    Uniform frustrumPositionUniform;
+    Uniform farPlaneUniform;
+    Uniform leftPlaneUniform;
+    Uniform rightPlaneUniform;
+    Uniform upPlaneUniform;
+    Uniform downPlaneUniform;
     GLuint workGroups;
 
 };
