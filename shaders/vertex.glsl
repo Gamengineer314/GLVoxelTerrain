@@ -1,9 +1,7 @@
 #version 460 core
 
-out struct V2F {
-    vec4 blockData; // x,y,z : block pos, w : light level
-    vec4 color; // x,y,z: color, w: random variation ammount
-} v2f;
+out vec4 blockData;
+out vec4 blockColor;
 
 
 #define mask2Bits 3u             // 0b11
@@ -58,6 +56,6 @@ void main() {
 
     // Output
     gl_Position = vpMatrix * vec4(pos, 1);
-    v2f.blockData = vec4(pos - normal * 0.5f, faceLightLevels[normalID]);
-    v2f.color = colors[square.y >> 24];
+    blockData = vec4(pos - normal * 0.5f, faceLightLevels[normalID]);
+    blockColor = colors[square.y >> 24];
 }
