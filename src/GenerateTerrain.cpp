@@ -1,7 +1,6 @@
 #include "GenerateTerrain.hpp"
 
 #include <cstdint>
-#include <cstring>
 #include <cmath>
 #include <vector>
 
@@ -9,7 +8,7 @@
 
 using namespace std;
 
-void generateHeightMap(int*& heightMap, int*& ids);
+void generateHeightMap(int* heightMap, int* ids);
 void generateIDs(int* heightMap, int* ids, vector<int>& IDs, uint32_t* IDIndexes);
 
 #define AMPLITUDE 30
@@ -17,24 +16,17 @@ void generateIDs(int* heightMap, int* ids, vector<int>& IDs, uint32_t* IDIndexes
 #define ID_HEIGHT 18
 
 
-void generateTerrain(int*& IDs, uint32_t*& IDIndexes) {
+void generateTerrain(vector<int>& IDs, uint32_t* IDIndexes) {
     int* heightMap = new int[HORIZONTAL_SIZE * HORIZONTAL_SIZE];
     int* ids = new int[HORIZONTAL_SIZE * HORIZONTAL_SIZE];
     generateHeightMap(heightMap, ids);
-
-    vector<int> IDsVec = vector<int>(); 
-    IDIndexes = new uint32_t[HORIZONTAL_SIZE * HORIZONTAL_SIZE + 1];
-    generateIDs(heightMap, ids, IDsVec, IDIndexes);
-
+    generateIDs(heightMap, ids, IDs, IDIndexes);
     delete[] heightMap;
     delete[] ids;
-    IDs = new int[IDsVec.size()];
-    IDIndexes[HORIZONTAL_SIZE * HORIZONTAL_SIZE] = IDsVec.size();
-    memcpy(IDs, IDsVec.data(), IDsVec.size() * sizeof(int));
 }
 
-#include <iostream>
-void generateHeightMap(int*& heightMap, int*& ids) {
+
+void generateHeightMap(int* heightMap, int* ids) {
     int index = 0;
     for (int z = 0; z < HORIZONTAL_SIZE; z++) {
         for (int x = 0; x < HORIZONTAL_SIZE; x++) {
@@ -73,4 +65,5 @@ void generateIDs(int* heightMap, int* ids, vector<int>& IDs, uint32_t* IDIndexes
             }
         }
     }
+    IDIndexes[HORIZONTAL_SIZE * HORIZONTAL_SIZE] = IDs.size();
 }

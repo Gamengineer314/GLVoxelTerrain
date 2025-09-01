@@ -122,8 +122,8 @@ public:
      * @param start First element to get
      * @return Data in the buffer
     **/
-    template<typename T> unique_ptr<T> getData(uint32_t n, uint32_t start = 0) const {
-        unique_ptr<void> data = make_unique<void>(n);
+    template<typename T> unique_ptr<T[]> getData(uint32_t n, uint32_t start = 0) const {
+        unique_ptr<T[]> data(new T[n]);
         glGetNamedBufferSubData(buffer, start * sizeof(T), n * sizeof(T), data.get());
         return data;
     }

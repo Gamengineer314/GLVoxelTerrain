@@ -29,7 +29,6 @@ enum class GeometryMode : GLenum {
 
 enum class MemoryBarrier : GLbitfield {
     vertices = GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT,
-    instances = GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT,
     indexType = GL_ELEMENT_ARRAY_BARRIER_BIT,
     uniform = GL_UNIFORM_BARRIER_BIT,
     textureFetch = GL_TEXTURE_FETCH_BARRIER_BIT,
@@ -113,7 +112,7 @@ inline void commandDraw(GeometryMode mode, const GraphicsShader& shader, const V
  * @param baseVertex For indexed rendering, index of the first vertex to draw
  * @param baseInstance Index of the first instance
 **/
-inline void commandDrawInstanced(GeometryMode mode, const GraphicsShader& shader, const VertexArray& array, uint32_t firstVertex, uint32_t vertexCount, uint32_t instanceCount, uint32_t baseVertex = 0, uint32_t baseInstance = 0) {
+inline void commandDrawInstanced(GeometryMode mode, const GraphicsShader& shader, const VertexArray& array, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex = 0, uint32_t baseVertex = 0, uint32_t baseInstance = 0) {
     commandBind(shader, array, NULL, NULL);
     IndexType indexType = array.indices();
     if (indexType == IndexType::none) {

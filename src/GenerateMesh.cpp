@@ -107,11 +107,11 @@ void generateBinarySolidBlocks(uint32_t chunkX, uint32_t chunkZ, int startY, int
                     rows[y + z * CHUNK_SIZE] |= (uint64_t)1 << x; // x
                     rows[x + z * CHUNK_SIZE + CHUNK_SIZE * CHUNK_SIZE] |= (uint64_t)1 << y; // y
                     rows[y + x * CHUNK_SIZE + 2 * CHUNK_SIZE * CHUNK_SIZE] |= (uint64_t)1 << z; // z
-                } 
+                }
                 else if (y == -1) ySide.x = true;
                 else if (y == CHUNK_SIZE) ySide.y = true;
             }
-            sides[x + z * CHUNK_SIZE + 2 * CHUNK_SIZE * CHUNK_SIZE] = ySide;
+            sides[x + z * CHUNK_SIZE + CHUNK_SIZE * CHUNK_SIZE] = ySide;
             xzIndex++;
         }
     }

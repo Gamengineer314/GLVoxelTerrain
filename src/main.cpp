@@ -35,13 +35,12 @@ using namespace glm;
 
 int main() {
     // Generate terrain
-    int* IDs;
-    uint32_t* IDIndexes;
+    vector<int> IDs;
+    uint32_t* IDIndexes = new uint32_t[HORIZONTAL_SIZE * HORIZONTAL_SIZE + 1];
     generateTerrain(IDs, IDIndexes);
     vector<VoxelMesh> meshes;
     vector<Square> squares;
-    generateMesh(0, 0, HORIZONTAL_CHUNKS, HORIZONTAL_CHUNKS, IDs, IDIndexes, meshes, squares);
-    delete[] IDs;
+    generateMesh(0, 0, HORIZONTAL_CHUNKS, HORIZONTAL_CHUNKS, IDs.data(), IDIndexes, meshes, squares);
     delete[] IDIndexes;
     
     // Initialize objects

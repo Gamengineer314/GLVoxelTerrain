@@ -18,6 +18,7 @@ VoxelMesh::VoxelMesh(CubeNormal normal, int chunkX, int chunkZ, int startY) :
     maxX(0),
     maxY(0),
     maxZ(0) {
+    position[AXIS(normal)] += NORMAL_POSITIVE(normal);
 }
 
 
@@ -27,7 +28,7 @@ Square VoxelMesh::add(int x, int y, int depth, int width, int height, int colorI
     u32vec3 min = vec3(0, 0, 0);
     min[WIDTH_AXIS(AXIS(normal))] += x;
     min[HEIGHT_AXIS(AXIS(normal))] += y;
-    min[AXIS(normal)] += depth + NORMAL_POSITIVE(normal);
+    min[AXIS(normal)] += depth;
     u32vec3 max = min;
     max[WIDTH_AXIS(AXIS(normal))] += width;
     max[HEIGHT_AXIS(AXIS(normal))] += height;

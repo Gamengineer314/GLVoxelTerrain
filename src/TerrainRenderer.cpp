@@ -72,7 +72,7 @@ void TerrainRenderer::render() {
     downPlaneUniform.setValue(camera.downPlane);
     paramsBuffer.clearData(sizeof(uint32_t));
     commandCompute(frustrumCulling, workGroups);
-    commandBarrier(MemoryBarrier::instances | MemoryBarrier::indirectCommand);
+    commandBarrier(MemoryBarrier::indirectCommand);
 
     // Draw
     graphicsPositionUniform.setValue(camera.position);
