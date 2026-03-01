@@ -75,16 +75,12 @@ public:
         other.buffer = 0;
     }
 
-    Buffer& operator=(Buffer&& other) {
-        if (this != &other) {
-            buffer = other.buffer;
-            other.buffer = 0;
-        }
+    Buffer& operator=(Buffer other) {
+        swap(buffer, other.buffer);
         return *this;
     }
 
     Buffer(const Buffer&) = delete;
-    Buffer& operator=(const Buffer&) = delete;
 
     /**
      * @brief Set the data of the buffer. No more calls to setDataUnique() can then be made.

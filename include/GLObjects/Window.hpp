@@ -23,9 +23,7 @@ public:
     ~Window();
 
     Window(Window&& other) = delete;
-    Window& operator=(Window&& other) = delete;
     Window(const Window&) = delete;
-    Window& operator=(const Window&) = delete;
 
     /**
      * @brief Window update (must be called each frame)

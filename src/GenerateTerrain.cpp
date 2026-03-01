@@ -11,9 +11,9 @@ using namespace std;
 void generateHeightMap(int* heightMap, int* ids);
 void generateIDs(int* heightMap, int* ids, vector<int>& IDs, uint32_t* IDIndexes);
 
-#define AMPLITUDE 30
+#define AMPLITUDE 80
 #define BLOCK_PERIOD 500
-#define ID_HEIGHT 18
+#define ID_HEIGHT 50
 
 
 void generateTerrain(vector<int>& IDs, uint32_t* IDIndexes) {

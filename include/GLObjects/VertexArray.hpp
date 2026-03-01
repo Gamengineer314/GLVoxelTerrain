@@ -61,16 +61,12 @@ public:
         other.array = 0;
     }
 
-    VertexArray& operator=(VertexArray&& other) {
-        if (this != &other) {
-            array = other.array;
-            other.array = 0;
-        }
+    VertexArray& operator=(VertexArray other) {
+        swap(array, other.array);
         return *this;
     }
 
     VertexArray(const VertexArray&) = delete;
-    VertexArray& operator=(const VertexArray&) = delete;
 
     /**
      * @brief Add or set a buffer in the array

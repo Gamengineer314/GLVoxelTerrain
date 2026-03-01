@@ -46,7 +46,7 @@ int main() {
     // Initialize objects
     Window window(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
     commandInit(WINDOW_WIDTH, WINDOW_HEIGHT);
-    Camera camera(WINDOW_WIDTH, WINDOW_HEIGHT, 60, 0.1, 1500, vec3(2048, 100, 2048), 0, 0);
+    Camera camera(WINDOW_WIDTH, WINDOW_HEIGHT, 60, 0.1, 9999, vec3(0, 400, 0), pi<float>() / 6, pi<float>() / 4);
     CameraController controller(window, camera, WINDOW_WIDTH, WINDOW_HEIGHT);
     TerrainRenderer renderer(camera);
     renderer.addMeshes(meshes, squares);

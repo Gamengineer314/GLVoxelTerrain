@@ -36,17 +36,12 @@ public:
         other.program = 0;
     }
 
-    Shader& operator=(Shader&& other) {
-        if (this != &other) {
-            program = other.program;
-            other.program = 0;
-            other.shaderBuffers = move(shaderBuffers);
-        }
+    Shader& operator=(Shader other) {
+        swap(program, other.program);
         return *this;
     }
 
     Shader(const Shader&) = delete;
-    Shader& operator=(const Shader&) = delete;
 
     /**
      * @brief Add or set a buffer in the shader
@@ -129,12 +124,13 @@ public:
 class Uniform {
 
 public:
+
     /**
      * @brief Get a uniform in a shader
      * @param shader The shader
      * @param name Name of the uniform in the shader
     **/
-    Uniform(Shader& shader, const char* name) : 
+    Uniform(const Shader& shader, const char* name) : 
         shader(shader), location(glGetUniformLocation(shader.id(), name)) {}
 
     /**
@@ -177,7 +173,8 @@ public:
     }
 
 private:
-    Shader& shader;
+
+    const Shader& shader;
     GLint location;
 
 };
