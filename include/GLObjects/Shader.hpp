@@ -32,12 +32,13 @@ public:
         glDeleteProgram(program);
     }
 
-    Shader(Shader&& other) : program(other.program) {
+    Shader(Shader&& other) : program(other.program), shaderBuffers(move(other.shaderBuffers)) {
         other.program = 0;
     }
 
     Shader& operator=(Shader other) {
         swap(program, other.program);
+        shaderBuffers.swap(other.shaderBuffers);
         return *this;
     }
 
@@ -180,4 +181,4 @@ private:
 };
 
 
-#endif // SHADER_H
+#endif

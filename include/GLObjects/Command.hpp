@@ -212,4 +212,4 @@ inline void commandBarrier(MemoryBarrier barrier) {
 }
 
 
-#endif // RENDER_H
+#endif

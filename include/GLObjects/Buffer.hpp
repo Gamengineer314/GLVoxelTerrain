@@ -217,4 +217,4 @@ struct IndirectDispatchArgs {
 };
 
 
-#endif // BUFFER_H
+#endif

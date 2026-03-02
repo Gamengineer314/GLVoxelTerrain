@@ -70,4 +70,4 @@ private:
 };
 
 
-#endif // TERRAIN_RENDERER_H
+#endif

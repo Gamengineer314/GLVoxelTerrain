@@ -104,4 +104,4 @@ private:
 };
 
 
-#endif // WINDOW_H
+#endif

@@ -57,12 +57,13 @@ public:
         glDeleteVertexArrays(1, &array);
     }
 
-    VertexArray(VertexArray&& other) : array(other.array) {
+    VertexArray(VertexArray&& other) : array(other.array), indexType(other.indexType) {
         other.array = 0;
     }
 
     VertexArray& operator=(VertexArray other) {
         swap(array, other.array);
+        indexType = other.indexType;
         return *this;
     }
 
@@ -194,4 +195,4 @@ private:
 };
 
 
-#endif // VERTEX_ARRAY_H
+#endif

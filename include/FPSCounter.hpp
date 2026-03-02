@@ -28,4 +28,4 @@ private:
 };
 
 
-#endif // FPS_COUNTER_H
+#endif

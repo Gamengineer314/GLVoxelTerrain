@@ -30,4 +30,4 @@ using namespace std;
 **/
 void generateMesh(uint32_t chunkStartX, uint32_t chunkStartZ, uint32_t chunkSizeX, uint32_t chunkSizeZ, int* IDs, uint32_t* IDIndexes, vector<VoxelMesh>& meshes, vector<Square>& squares);
 
-#endif // MESH_GENERATOR_H
+#endif
