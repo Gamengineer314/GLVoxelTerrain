@@ -27,10 +27,11 @@ using namespace chrono;
 using namespace chrono_literals;
 using namespace glm;
 
-#define WINDOW_WIDTH 1920
-#define WINDOW_HEIGHT 1080
-#define TITLE "Voxel Terrain"
-#define BACKGROUND_COLOR 0, 0.8, 1.0
+
+static constexpr int windowWidth = 1920;
+static constexpr int windowHeight = 1080;
+static constexpr const char* title = "Voxel Terrain";
+static constexpr float backgroundRed = 0, backgroundGreen = 0.8, backgroundBlue = 1.0;
 
 
 int main() {
@@ -44,10 +45,10 @@ int main() {
     delete[] IDIndexes;
     
     // Initialize objects
-    Window window(WINDOW_WIDTH, WINDOW_HEIGHT, TITLE);
-    commandInit(WINDOW_WIDTH, WINDOW_HEIGHT);
-    Camera camera(WINDOW_WIDTH, WINDOW_HEIGHT, 60, 0.1, 9999, vec3(0, 400, 0), pi<float>() / 6, pi<float>() / 4);
-    CameraController controller(window, camera, WINDOW_WIDTH, WINDOW_HEIGHT);
+    Window window(windowWidth, windowHeight, title);
+    commandInit(windowWidth, windowHeight);
+    Camera camera(windowWidth, windowHeight, 60, 0.1, 9999, vec3(0, 400, 0), pi<float>() / 6, pi<float>() / 4);
+    CameraController controller(window, camera, windowWidth, windowHeight);
     TerrainRenderer renderer(camera);
     renderer.addMeshes(meshes, squares);
     renderer.prepareRender();
@@ -64,7 +65,7 @@ int main() {
 
         // Update
         controller.update(deltaTime);
-        commandBackground(BACKGROUND_COLOR);
+        commandBackground(backgroundRed, backgroundGreen, backgroundBlue);
         renderer.render();
         fpsCounter.update(deltaTime);
         terminal.render();

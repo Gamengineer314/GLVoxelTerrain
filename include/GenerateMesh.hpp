@@ -6,8 +6,6 @@
 
 #include "VoxelMesh.hpp"
 
-using namespace std;
-
 // IDs contains all block rows one after the other.
 // A row contains all blocks for an (x, z) coordinate in ascending order.
 // Even indices : y coordinates, odd indices : color ids.
@@ -28,6 +26,6 @@ using namespace std;
  * @param meshes Vector to add output meshes to
  * @param squares Vector to add output squares to
 **/
-void generateMesh(uint32_t chunkStartX, uint32_t chunkStartZ, uint32_t chunkSizeX, uint32_t chunkSizeZ, int* IDs, uint32_t* IDIndexes, vector<VoxelMesh>& meshes, vector<Square>& squares);
+void generateMesh(uint32_t chunkStartX, uint32_t chunkStartZ, uint32_t chunkSizeX, uint32_t chunkSizeZ, int* IDs, uint32_t* IDIndexes, std::vector<VoxelMesh>& meshes, std::vector<Square>& squares);
 
 #endif

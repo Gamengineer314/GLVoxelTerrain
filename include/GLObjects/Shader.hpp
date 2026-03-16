@@ -8,9 +8,6 @@
 
 #include "GLObjects/Buffer.hpp"
 
-using namespace std;
-using namespace glm;
-
 
 enum class ShaderType : GLenum {
     vertex = GL_VERTEX_SHADER,
@@ -37,7 +34,7 @@ public:
     }
 
     Shader& operator=(Shader other) {
-        swap(program, other.program);
+        std::swap(program, other.program);
         shaderBuffers.swap(other.shaderBuffers);
         return *this;
     }
@@ -55,7 +52,7 @@ public:
     /**
      * @brief Get the buffers in the shader
     **/
-    const vector<ShaderBuffer>& buffers() const {
+    const std::vector<ShaderBuffer>& buffers() const {
         return shaderBuffers;
     }
 
@@ -76,7 +73,7 @@ public:
 protected:
 
     GLuint program;
-    vector<ShaderBuffer> shaderBuffers;
+    std::vector<ShaderBuffer> shaderBuffers;
 
     /**
      * @brief Attach a new shader to the program
@@ -138,7 +135,7 @@ public:
      * @brief Set the value of the matrix uniform
      * @param value The value to set the uniform to
     **/
-    void setValue(mat4& value) {
+    void setValue(const glm::mat4& value) {
         glProgramUniformMatrix4fv(shader.id(), location, 1, GL_FALSE, value_ptr(value));
     }
 
@@ -146,7 +143,7 @@ public:
      * @brief Set the value of the vector uniform
      * @param value The value to set the uniform to
     **/
-    void setValue(vec3& value) {
+    void setValue(const glm::vec3& value) {
         glProgramUniform3fv(shader.id(), location, 1, value_ptr(value));
     }
 
@@ -154,7 +151,7 @@ public:
      * @brief Set the value of the vector uniform
      * @param value The value to set the uniform to
     **/
-    void setValue(vec4& value) {
+    void setValue(const glm::vec4& value) {
         glProgramUniform4fv(shader.id(), location, 1, value_ptr(value));
     }
 

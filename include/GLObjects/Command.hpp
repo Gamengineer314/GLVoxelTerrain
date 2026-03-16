@@ -8,8 +8,6 @@
 #include "GLObjects/VertexArray.hpp"
 #include "GLObjects/Shader.hpp"
 
-using namespace std;
-
 
 enum class GeometryMode : GLenum {
     points = GL_POINTS,

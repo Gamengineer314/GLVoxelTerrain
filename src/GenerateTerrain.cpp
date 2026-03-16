@@ -11,9 +11,10 @@ using namespace std;
 void generateHeightMap(int* heightMap, int* ids);
 void generateIDs(int* heightMap, int* ids, vector<int>& IDs, uint32_t* IDIndexes);
 
-#define AMPLITUDE 80
-#define BLOCK_PERIOD 500
-#define ID_HEIGHT 50
+
+static constexpr int amplitude = 80;
+static constexpr int blockPeriod = 500;
+static constexpr int idHeight = 50;
 
 
 void generateTerrain(vector<int>& IDs, uint32_t* IDIndexes) {
@@ -30,9 +31,9 @@ void generateHeightMap(int* heightMap, int* ids) {
     int index = 0;
     for (int z = 0; z < HORIZONTAL_SIZE; z++) {
         for (int x = 0; x < HORIZONTAL_SIZE; x++) {
-            int height = 1 + (int)(AMPLITUDE * (sin(2 * M_PI * x / BLOCK_PERIOD) * sin(2 * M_PI * z / BLOCK_PERIOD) + 1));
+            int height = 1 + (int)(amplitude * (sin(2 * M_PI * x / blockPeriod) * sin(2 * M_PI * z / blockPeriod) + 1));
             heightMap[index] = height;
-            ids[index] = height / ID_HEIGHT + 1;
+            ids[index] = height / idHeight + 1;
             index++;
         }
     }

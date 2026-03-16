@@ -226,9 +226,9 @@ void generateAxisBinaryPlanes(uint32_t axis, uint32_t startXZIndex, int startY, 
                 }
             }
 
-            pos[WIDTH_AXIS(axis)]++;
+            pos[widthAxis(axis)]++;
         }
-        beforeX[HEIGHT_AXIS(axis)]++;
+        beforeX[heightAxis(axis)]++;
     }
 }
 

@@ -7,6 +7,9 @@
 using namespace std;
 
 
+static constexpr float refreshRate = 0.5; // Time (in seconds) between each FPS update
+
+
 FPSCounter::FPSCounter(TerminalRenderer& renderer) :
     TerminalRenderer::Component(renderer, 1),
     time(0),
@@ -17,7 +20,7 @@ FPSCounter::FPSCounter(TerminalRenderer& renderer) :
 void FPSCounter::update(float deltaTime) {
     time += deltaTime;
     frames++;
-    if (time >= REFRESH_RATE) {
+    if (time >= refreshRate) {
         string line = "FPS: " + to_string(frames / time);
         Component::update(&line);
         time = 0;

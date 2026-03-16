@@ -5,8 +5,6 @@
 #include <memory>
 #include <glad/glad.h>
 
-using namespace std;
-
 
 enum class BufferUsage : GLenum {
     streamDraw = GL_STREAM_DRAW,
@@ -76,7 +74,7 @@ public:
     }
 
     Buffer& operator=(Buffer other) {
-        swap(buffer, other.buffer);
+        std::swap(buffer, other.buffer);
         return *this;
     }
 
@@ -118,8 +116,8 @@ public:
      * @param start First element to get
      * @return Data in the buffer
     **/
-    template<typename T> unique_ptr<T[]> getData(uint32_t n, uint32_t start = 0) const {
-        unique_ptr<T[]> data(new T[n]);
+    template<typename T> std::unique_ptr<T[]> getData(uint32_t n, uint32_t start = 0) const {
+        std::unique_ptr<T[]> data(new T[n]);
         glGetNamedBufferSubData(buffer, start * sizeof(T), n * sizeof(T), data.get());
         return data;
     }

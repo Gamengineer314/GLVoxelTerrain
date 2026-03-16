@@ -3,8 +3,6 @@
 
 #include "TerminalRenderer.hpp"
 
-#define REFRESH_RATE 0.5f // Time (in seconds) between each FPS update
-
 
 class FPSCounter : private TerminalRenderer::Component {
 

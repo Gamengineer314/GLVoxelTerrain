@@ -62,7 +62,7 @@ public:
     }
 
     VertexArray& operator=(VertexArray other) {
-        swap(array, other.array);
+        std::swap(array, other.array);
         indexType = other.indexType;
         return *this;
     }

@@ -7,8 +7,6 @@
 #include "GLObjects/Window.hpp"
 #include "Camera.hpp"
 
-using namespace glm;
-
 
 class CameraController {
 

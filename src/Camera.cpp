@@ -5,12 +5,11 @@
 #include <glm/gtx/quaternion.hpp>
 
 using namespace std;
-
 using namespace glm;
 
 
 // Reverse x and z axes to convert from view (x+ = left, z+ = forward) to screen view (x+ = right, z+ = backward)
-#define VIEW_TO_SCREENVIEW mat4(-1,0,0,0, 0,1,0,0, 0,0,-1,0, 0,0,0,1)
+static constexpr mat4 viewtoScreenview(-1,0,0,0, 0,1,0,0, 0,0,-1,0, 0,0,0,1);
 
 
 Camera::Camera(int width, int height, float fov, float nearClip, float farClip, vec3 position, float xOrientation, float yOrientation) : 
@@ -27,7 +26,7 @@ Camera::Camera(int width, int height, float fov, float nearClip, float farClip, 
 
 
 void Camera::update() {
-    mat4 view = VIEW_TO_SCREENVIEW * translate(mat4_cast(quat(orientation.w, -orientation.x, -orientation.y, -orientation.z)), -position);
+    mat4 view = viewtoScreenview * translate(mat4_cast(quat(orientation.w, -orientation.x, -orientation.y, -orientation.z)), -position);
     mat4 projection = perspective(fov, (float)width / height, nearClip, farClip);
     vpMatrix = projection * view;
     farPlane = vec4(vpMatrix[0][3] - vpMatrix[0][2], vpMatrix[1][3] - vpMatrix[1][2], vpMatrix[2][3] - vpMatrix[2][2], vpMatrix[3][3] - vpMatrix[3][2]);

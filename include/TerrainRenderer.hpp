@@ -9,13 +9,6 @@
 #include "Camera.hpp"
 #include "VoxelMesh.hpp"
 
-using namespace std;
-
-// Number of threads in a work group for the compute shader
-#define THREAD_GROUP_SIZE 64
-// Remove small (1 pixel) gaps between triangles
-#define QUADS_INTERLEAVING 0.05f
-
 
 class TerrainRenderer {
 
@@ -31,7 +24,7 @@ public:
      * @param meshes Meshes to add
      * @param squares Squares in the added meshes
     **/
-    void addMeshes(vector<VoxelMesh>& meshes, vector<Square>& squares);
+    void addMeshes(const std::vector<VoxelMesh>& meshes, const std::vector<Square>& squares);
 
     /**
      * @brief 
@@ -48,18 +41,18 @@ public:
 private:
     Camera& camera;
     GraphicsShader shader;
-    vector<MeshData> meshData; // All meshes information (position, size, rectangles indices)
-    vector<Square> squares; // All rectangles (position, width, height, normal)
+    std::vector<MeshData> meshData; // All meshes information (position, size, rectangles indices)
+    std::vector<Square> squares; // All rectangles (position, width, height, normal)
     Buffer squaresBuffer;
     Buffer commandsBuffer;
     VertexArray vertexArray;
     Uniform graphicsPositionUniform;
     Uniform vpMatrixUniform;
 
-    ComputeShader frustrumCulling;
+    ComputeShader frustumCulling;
     Buffer meshDataBuffer;
     Buffer paramsBuffer;
-    Uniform frustrumPositionUniform;
+    Uniform frustumPositionUniform;
     Uniform farPlaneUniform;
     Uniform leftPlaneUniform;
     Uniform rightPlaneUniform;

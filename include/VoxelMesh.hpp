@@ -4,12 +4,6 @@
 #include <cstdint>
 #include <glm/glm.hpp>
 
-using namespace glm;
-
-class VoxelMesh;
-class Square;
-class MeshData;
-
 
 
 enum class CubeNormal {
@@ -23,17 +17,49 @@ enum class CubeNormal {
 
 
 // x: 0, y: 1, z: 2
-#define AXIS(normal) ((uint32_t)(normal) >> 1)
+constexpr uint32_t axis(CubeNormal normal) {
+    return (uint32_t)normal >> 1;
+}
+
 // x: 1, y: 0, z: 1
-#define WIDTH_AXIS(axis) ((uint32_t)1 & ~(uint32_t)(axis))
+constexpr uint32_t widthAxis(uint32_t axis) {
+    return (uint32_t)1 & ~axis;
+}
+
 // x: 2, y: 2, z: 0
-#define HEIGHT_AXIS(axis) ((uint32_t)2 & ~(uint32_t)(axis))
+constexpr uint32_t heightAxis(uint32_t axis) {
+    return (uint32_t)2 & ~axis;
+}
+
 // +: 1, -: 0
-#define NORMAL_POSITIVE(normal) (~(uint32_t)(normal) & (uint32_t)1)
+constexpr uint32_t normalPositive(CubeNormal normal) {
+    return (uint32_t)1 & ~(uint32_t)normal;
+}
+
 // +: 0, -: 1
-#define NORMAL_NEGATIVE(normal) ((uint32_t)(normal) & (uint32_t)1)
+constexpr uint32_t normalNegative(CubeNormal normal) {
+    return (uint32_t)1 & (uint32_t)normal;
+}
+
 // +: 1, -: -1
-#define NORMAL_SIGN(normal) ((int)1 | -(int)((uint32_t)(normal) & (uint32_t)1))
+constexpr int normalSign(CubeNormal normal) {
+    return (int)1 | -(int)((uint32_t)normal & (uint32_t)1);
+}
+
+
+
+class Square {
+
+public:
+    Square(uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, CubeNormal normal, uint32_t colorID) :
+        data1(x | (z << 13)),
+        data2(y | ((w - 1) << 9) | ((h - 1) << 15) | ((uint32_t)normal << 21) | (colorID << 24)) {}
+
+private:
+    uint32_t data1; // x (13b), z (13b)
+    uint32_t data2; // y (9b), width (6b), height (6b), normal (3b), color (8b)
+
+};
 
 
 
@@ -41,8 +67,8 @@ enum class CubeNormal {
 class VoxelMesh {
 
 public:
-    u32vec3 position;
-    uint32_t normal;
+    glm::u32vec3 position;
+    CubeNormal normal;
     uint32_t squaresCount;
 
     /**
@@ -66,9 +92,13 @@ public:
     **/
     Square add(int x, int y, int depth, int width, int height, int colorID);
 
-    vec3 center();
+    glm::vec3 center() const {
+        return (glm::vec3)position + glm::vec3(minX + maxX, minY + maxY, minZ + maxZ) / 2.0f;
+    }
 
-    vec3 size();
+    glm::vec3 size() const {
+        return glm::vec3(maxX - minX, maxY - minY, maxZ - minZ) / 2.0f;
+    }
 
 private:
     uint32_t minX;
@@ -82,29 +112,20 @@ private:
 
 
 
-class Square {
-
-public:
-    Square(uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, uint32_t normal, uint32_t colorID);
-
-private:
-    uint32_t data1; // x (13b), z (13b)
-    uint32_t data2; // y (9b), width (6b), height (6b), normal (3b), color (8b)
-
-};
-
-
-
 class MeshData {
 
 public:
-    MeshData(vec3 center, vec3 size, uint32_t normal, uint32_t squareCount, uint32_t startSquare);
-    MeshData(VoxelMesh& mesh, uint32_t startSquare) : MeshData(mesh.center(), mesh.size(), mesh.normal, mesh.squaresCount, startSquare) {};
+    MeshData(glm::vec3 center, glm::vec3 size, CubeNormal normal, uint32_t squareCount, uint32_t startSquare) :
+        center(center),
+        data1((uint32_t)normal | (squareCount << 3)),
+        size(size),
+        data2(startSquare) {}
+    MeshData(const VoxelMesh& mesh, uint32_t startSquare) : MeshData(mesh.center(), mesh.size(), mesh.normal, mesh.squaresCount, startSquare) {};
 
 public:
-    vec3 center;
+    glm::vec3 center;
     uint32_t data1; // normal (3b), squareCount (29b)
-    vec3 size;
+    glm::vec3 size;
     uint32_t data2; // startSquare (32b)
 
 };

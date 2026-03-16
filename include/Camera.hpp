@@ -4,8 +4,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/quaternion.hpp>
 
-using namespace glm;
-
 
 class Camera {
 
@@ -16,15 +14,15 @@ public:
     float nearClip;
     float farClip;
 
-    vec3 position;
-    quat orientation;
+    glm::vec3 position;
+    glm::quat orientation;
 
-    vec4 farPlane; // x,y,z: normal, w: distance
-    vec4 leftPlane;
-    vec4 rightPlane;
-    vec4 upPlane;
-    vec4 downPlane;
-    mat4 vpMatrix;
+    glm::vec4 farPlane; // x,y,z: normal, w: distance
+    glm::vec4 leftPlane;
+    glm::vec4 rightPlane;
+    glm::vec4 upPlane;
+    glm::vec4 downPlane;
+    glm::mat4 vpMatrix;
 
     /**
      * @brief Create a new camera
@@ -37,7 +35,7 @@ public:
      * @param xOrientation Initial orientation around the x axis (in radians)
      * @param yOrientation Initial orientation around the y axis (in radians)
     **/
-    Camera(int width, int height, float fov = 60, float nearClip = 0.1, float farClip = 1500, vec3 position = vec3(0, 0, 0), float xOrientation = 0, float yOrientation = 0);
+    Camera(int width, int height, float fov = 60, float nearClip = 0.1, float farClip = 1500, glm::vec3 position = glm::vec3(0, 0, 0), float xOrientation = 0, float yOrientation = 0);
 
     /**
      * @brief Update matrix and planes based on position and orientation (must be called after changing position or orientation)
@@ -48,13 +46,13 @@ public:
      * @brief Translate the camera
      * @param translation Translation vector (in camera space)
     **/
-    void localTranslate(vec3 translation);
+    void localTranslate(glm::vec3 translation);
 
     /**
      * @brief Translate the camera
      * @param translation Translation vector (in world space)
     **/
-    void globalTranslate(vec3 translation);
+    void globalTranslate(glm::vec3 translation);
 
     /**
      * @brief Rotate the camera

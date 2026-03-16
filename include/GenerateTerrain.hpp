@@ -4,13 +4,11 @@
 #include <cstdint>
 #include <vector>
 
-using namespace std;
-
 /**
  * @brief Generate a terrain
- * @param IDs Block IDs (output, must be freed after use)
- * @param IDIndexes Start index for each (x, z) in IDs (output, must be freed after use)
+ * @param IDs Block IDs
+ * @param IDIndexes Start index for each (x, z) in IDs
 **/
-void generateTerrain(vector<int>& IDs, uint32_t* IDIndexes);
+void generateTerrain(std::vector<int>& IDs, uint32_t* IDIndexes);
 
 #endif

@@ -9,6 +9,11 @@
 #include "VoxelMesh.hpp"
 
 using namespace std;
+using namespace glm;
+
+
+static constexpr int threadGroupSize = 64; // Number of threads in a work group for the compute shader
+static constexpr float quadsInterleaving = 0.05f; // Remove small (1 pixel) gaps between triangles
 
 
 TerrainRenderer::TerrainRenderer(Camera& camera)
@@ -16,22 +21,22 @@ TerrainRenderer::TerrainRenderer(Camera& camera)
     shader("shaders/vertex.glsl", "shaders/fragment.glsl"),
     graphicsPositionUniform(shader, "position"),
     vpMatrixUniform(shader, "vpMatrix"),
-    frustrumCulling("shaders/frustrumCulling.glsl"),
-    frustrumPositionUniform(frustrumCulling, "position"),
-    farPlaneUniform(frustrumCulling, "farPlane"),
-    leftPlaneUniform(frustrumCulling, "leftPlane"),
-    rightPlaneUniform(frustrumCulling, "rightPlane"),
-    upPlaneUniform(frustrumCulling, "upPlane"),
-    downPlaneUniform(frustrumCulling, "downPlane") {
+    frustumCulling("shaders/frustumCulling.glsl"),
+    frustumPositionUniform(frustumCulling, "position"),
+    farPlaneUniform(frustumCulling, "farPlane"),
+    leftPlaneUniform(frustumCulling, "leftPlane"),
+    rightPlaneUniform(frustumCulling, "rightPlane"),
+    upPlaneUniform(frustumCulling, "upPlane"),
+    downPlaneUniform(frustumCulling, "downPlane") {
     Uniform(shader, "seed").setValue(rand() / (float)RAND_MAX);
-    Uniform(shader, "quadsInterleaving").setValue(QUADS_INTERLEAVING);
-    frustrumCulling.setBuffer(0, ShaderBufferType::storage, meshDataBuffer);
-    frustrumCulling.setBuffer(1, ShaderBufferType::storage, commandsBuffer);
-    frustrumCulling.setBuffer(0, ShaderBufferType::counters, paramsBuffer);
+    Uniform(shader, "quadsInterleaving").setValue(quadsInterleaving);
+    frustumCulling.setBuffer(0, ShaderBufferType::storage, meshDataBuffer);
+    frustumCulling.setBuffer(1, ShaderBufferType::storage, commandsBuffer);
+    frustumCulling.setBuffer(0, ShaderBufferType::counters, paramsBuffer);
 }
 
 
-void TerrainRenderer::addMeshes(vector<VoxelMesh>& meshes, vector<Square>& squares) {
+void TerrainRenderer::addMeshes(const vector<VoxelMesh>& meshes, const vector<Square>& squares) {
     uint32_t startSquare = this->squares.size();
     for (VoxelMesh mesh : meshes) {
         meshData.push_back(MeshData(mesh, startSquare));
@@ -43,8 +48,8 @@ void TerrainRenderer::addMeshes(vector<VoxelMesh>& meshes, vector<Square>& squar
 
 void TerrainRenderer::prepareRender() {
     // Add empty meshes at the end to have a size multiple of THREAD_GROUP_SIZE
-    while (meshData.size() % THREAD_GROUP_SIZE != 0) meshData.push_back(MeshData(vec3(0), vec3(0), 0, 0, 0));
-    workGroups = meshData.size() / THREAD_GROUP_SIZE;
+    while (meshData.size() % threadGroupSize != 0) meshData.push_back(MeshData(vec3(0), vec3(0), CubeNormal::xPositive, 0, 0));
+    workGroups = meshData.size() / threadGroupSize;
 
     // Create buffers
     squaresBuffer.setDataUnique(squares.data(), squares.size(), UniqueBufferUsage::none);
@@ -63,15 +68,15 @@ void TerrainRenderer::prepareRender() {
 
 
 void TerrainRenderer::render() {
-    // Frustrum culling
-    frustrumPositionUniform.setValue(camera.position);
+    // Frustum culling
+    frustumPositionUniform.setValue(camera.position);
     farPlaneUniform.setValue(camera.farPlane);
     leftPlaneUniform.setValue(camera.leftPlane);
     rightPlaneUniform.setValue(camera.rightPlane);
     upPlaneUniform.setValue(camera.upPlane);
     downPlaneUniform.setValue(camera.downPlane);
     paramsBuffer.clearData(sizeof(uint32_t));
-    commandCompute(frustrumCulling, workGroups);
+    commandCompute(frustumCulling, workGroups);
     commandBarrier(MemoryBarrier::indirectCommand);
 
     // Draw
