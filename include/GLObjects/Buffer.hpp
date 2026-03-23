@@ -5,6 +5,7 @@
 #include <memory>
 #include <glad/glad.h>
 
+namespace gl {
 
 enum class BufferUsage : GLenum {
     streamDraw = GL_STREAM_DRAW,
@@ -58,9 +59,7 @@ enum class ShaderBufferType : GLenum {
 
 
 class Buffer {
-
 public:
-
     Buffer() {
         glCreateBuffers(1, &buffer);
     }
@@ -78,7 +77,7 @@ public:
         return *this;
     }
 
-    Buffer(const Buffer&) = delete;
+    Buffer(Buffer const&) = delete;
 
     /**
      * @brief Set the data of the buffer. No more calls to setDataUnique() can then be made.
@@ -163,56 +162,33 @@ public:
     }
 
 private:
-
     GLuint buffer;
-    
-};
-
-
-struct ShaderBuffer {
-    const Buffer* buffer;
-    ShaderBufferType type;
-    uint32_t index;
-
-    ShaderBuffer(const Buffer& buffer, ShaderBufferType type, uint32_t index) :
-        buffer(&buffer), type(type), index(index) {}
 };
 
 
 struct IndirectDrawArgs {
-    uint32_t vertexCount;
-    uint32_t instanceCount;
-    uint32_t firstVertex;
-    uint32_t baseInstance;
-
-    IndirectDrawArgs() = default;
-    IndirectDrawArgs(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t firstVertex = 0, uint32_t baseInstance = 0) :
-        vertexCount(vertexCount), instanceCount(instanceCount), firstVertex(firstVertex), baseInstance(baseInstance) {}
+    uint32_t vertexCount = 0;
+    uint32_t instanceCount = 1;
+    uint32_t firstVertex = 0;
+    uint32_t firstInstance = 0;
 };
 
 
 struct IndirectIndexedDrawArgs {
-    uint32_t vertexCount;
-    uint32_t instanceCount;
-    uint32_t firstVertex;
-    int32_t baseVertex;
-    uint32_t baseInstance;
-
-    IndirectIndexedDrawArgs() = default;
-    IndirectIndexedDrawArgs(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t firstVertex = 0, uint32_t baseVertex = 0, uint32_t baseInstance = 0) :
-        vertexCount(vertexCount), instanceCount(instanceCount), firstVertex(firstVertex), baseVertex(baseVertex), baseInstance(baseInstance) {}
+    uint32_t indexCount = 0;
+    uint32_t instanceCount = 1;
+    uint32_t firstIndex = 0;
+    int32_t baseVertex = 0;
+    uint32_t firstInstance = 0;
 };
 
 
 struct IndirectDispatchArgs {
-    uint32_t numGroupsX;
-    uint32_t numGroupsY;
-    uint32_t numGroupsZ;
-
-    IndirectDispatchArgs() = default;
-    IndirectDispatchArgs(uint32_t numGroupsX = 1, uint32_t numGroupsY = 1, uint32_t numGroupsZ = 1) :
-        numGroupsX(numGroupsX), numGroupsY(numGroupsY), numGroupsZ(numGroupsZ) {}
+    uint32_t numGroupsX = 1;
+    uint32_t numGroupsY = 1;
+    uint32_t numGroupsZ = 1;
 };
 
+}
 
 #endif

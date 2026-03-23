@@ -9,7 +9,6 @@
 
 
 class CameraController {
-
 public:
     float sensitivityX;
     float sensitivityY;
@@ -36,7 +35,6 @@ public:
 private:
     Window& window;
     Camera& camera;
-
 };
 
 

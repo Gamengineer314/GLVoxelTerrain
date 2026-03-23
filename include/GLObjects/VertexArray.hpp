@@ -5,6 +5,7 @@
 
 #include "GLObjects/Buffer.hpp"
 
+namespace gl {
 
 enum class IntAttributeType : GLenum {
     int8 = GL_BYTE,
@@ -41,14 +42,11 @@ enum class IndexType : GLenum {
     uint8 = GL_UNSIGNED_BYTE,
     uint16 = GL_UNSIGNED_SHORT,
     uint32 = GL_UNSIGNED_INT,
-    none = 0
 };
 
 
 class VertexArray {
-
 public:
-
     VertexArray() {
         glCreateVertexArrays(1, &array);
     }
@@ -57,17 +55,16 @@ public:
         glDeleteVertexArrays(1, &array);
     }
 
-    VertexArray(VertexArray&& other) : array(other.array), indexType(other.indexType) {
+    VertexArray(VertexArray&& other) : array(other.array) {
         other.array = 0;
     }
 
     VertexArray& operator=(VertexArray other) {
         std::swap(array, other.array);
-        indexType = other.indexType;
         return *this;
     }
 
-    VertexArray(const VertexArray&) = delete;
+    VertexArray(VertexArray const&) = delete;
 
     /**
      * @brief Add or set a buffer in the array
@@ -77,7 +74,7 @@ public:
      * @param start First element to use
      * @param instances 0 for a vertex buffer, 1 for an instance buffer, > 1 to specify the number of instances that share the same attribute
     **/
-    void setBuffer(uint32_t index, const Buffer& buffer, uint32_t stride, uint32_t start = 0, uint32_t instances = 0) const {
+    void setBuffer(uint32_t index, Buffer const& buffer, uint32_t stride, uint32_t start = 0, uint32_t instances = 0) const {
         glVertexArrayVertexBuffer(array, index, buffer.id(), start * stride, stride);
         if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
     }
@@ -153,9 +150,8 @@ public:
      * @param buffer The buffer to add
      * @param indexType Data type of the indices
     **/
-    void setIndices(const Buffer& buffer, IndexType indexType) {
+    void setIndices(Buffer const& buffer) {
         glVertexArrayElementBuffer(array, buffer.id());
-        this->indexType = indexType;
     }
 
     /**
@@ -163,7 +159,6 @@ public:
     **/
     void removeIndices() {
         glVertexArrayElementBuffer(array, 0);
-        indexType = IndexType::none;
     }
 
     /**
@@ -180,19 +175,10 @@ public:
         return array;
     }
 
-    /**
-     * @brief Index type if the array is indexed, IndexType::none otherwise
-    **/
-    IndexType indices() const {
-        return indexType;
-    }
-
 private:
-
     GLuint array;
-    IndexType indexType = IndexType::none;
-
 };
 
+}
 
 #endif

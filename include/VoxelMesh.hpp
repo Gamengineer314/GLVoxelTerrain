@@ -49,7 +49,6 @@ constexpr int normalSign(CubeNormal normal) {
 
 
 class Square {
-
 public:
     Square(uint32_t x, uint32_t y, uint32_t z, uint32_t w, uint32_t h, CubeNormal normal, uint32_t colorID) :
         data1(x | (z << 13)),
@@ -58,14 +57,12 @@ public:
 private:
     uint32_t data1; // x (13b), z (13b)
     uint32_t data2; // y (9b), width (6b), height (6b), normal (3b), color (8b)
-
 };
 
 
 
 // Mesh with all rectangles with the same normal and in the same chunk
 class VoxelMesh {
-
 public:
     glm::u32vec3 position;
     CubeNormal normal;
@@ -107,13 +104,11 @@ private:
     uint32_t maxX;
     uint32_t maxY;
     uint32_t maxZ;
-    
 };
 
 
 
 class MeshData {
-
 public:
     MeshData(glm::vec3 center, glm::vec3 size, CubeNormal normal, uint32_t squareCount, uint32_t startSquare) :
         center(center),
@@ -127,7 +122,6 @@ public:
     uint32_t data1; // normal (3b), squareCount (29b)
     glm::vec3 size;
     uint32_t data2; // startSquare (32b)
-
 };
 
 

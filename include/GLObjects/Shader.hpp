@@ -8,6 +8,7 @@
 
 #include "GLObjects/Buffer.hpp"
 
+namespace gl {
 
 enum class ShaderType : GLenum {
     vertex = GL_VERTEX_SHADER,
@@ -20,41 +21,23 @@ enum class ShaderType : GLenum {
 
 
 class Shader {
-
 public:
-
     Shader() : program(glCreateProgram()) {}
 
     ~Shader() {
         glDeleteProgram(program);
     }
 
-    Shader(Shader&& other) : program(other.program), shaderBuffers(move(other.shaderBuffers)) {
+    Shader(Shader&& other) : program(other.program) {
         other.program = 0;
     }
 
     Shader& operator=(Shader other) {
         std::swap(program, other.program);
-        shaderBuffers.swap(other.shaderBuffers);
         return *this;
     }
 
-    Shader(const Shader&) = delete;
-
-    /**
-     * @brief Add or set a buffer in the shader
-     * @param index Index of the buffer
-     * @param type Buffer type
-     * @param buffer The buffer
-    **/
-    void setBuffer(uint32_t index, ShaderBufferType type, const Buffer& buffer);
-
-    /**
-     * @brief Get the buffers in the shader
-    **/
-    const std::vector<ShaderBuffer>& buffers() const {
-        return shaderBuffers;
-    }
+    Shader(Shader const&) = delete;
 
     /**
      * @brief Use the shader for future OpenGL calls
@@ -71,95 +54,88 @@ public:
     }
 
 protected:
-
     GLuint program;
-    std::vector<ShaderBuffer> shaderBuffers;
 
     /**
      * @brief Attach a new shader to the program
      * @param path Path to the shader file
      * @param type Shader type
     **/
-    void attachShader(const char* path, ShaderType type) const;
-
+    void attachShader(char const* path, ShaderType type) const;
 };
 
 
 class GraphicsShader : public Shader {
-
 public:
-
     /**
      * @brief Create a new shader for rendering
      * @param vertexPath Path to the vertex shader file
      * @param fragmentPath Path to the fragment shader file
     **/
-    GraphicsShader(const char* vertexPath, const char* fragmentPath) : Shader() {
+    GraphicsShader(char const* vertexPath, char const* fragmentPath) : Shader() {
         attachShader(vertexPath, ShaderType::vertex);
         attachShader(fragmentPath, ShaderType::fragment);
         glLinkProgram(program);
     }
-
 };
 
 
 class ComputeShader : public Shader {
-
 public:
-
     /**
      * @brief Create a new compute shader
      * @param path Path to the compute shader file
     **/
-    explicit ComputeShader(const char* path) : Shader() {
+    explicit ComputeShader(char const* path) : Shader() {
         attachShader(path, ShaderType::compute);
         glLinkProgram(program);
     }
-
 };
 
 
 class Uniform {
-
 public:
-
     /**
-     * @brief Get a uniform in a shader
-     * @param shader The shader
+     * @brief Get a uniform
+     * @param shader The uniform's shader
      * @param name Name of the uniform in the shader
     **/
-    Uniform(const Shader& shader, const char* name) : 
-        shader(shader), location(glGetUniformLocation(shader.id(), name)) {}
+    Uniform(Shader const& shader, char const* name) :
+        location(glGetUniformLocation(shader.id(), name)) {}
 
     /**
      * @brief Set the value of the matrix uniform
+     * @param shader The uniform's shader
      * @param value The value to set the uniform to
     **/
-    void setValue(const glm::mat4& value) {
+    void setValue(Shader const& shader, glm::mat4 const& value) {
         glProgramUniformMatrix4fv(shader.id(), location, 1, GL_FALSE, value_ptr(value));
     }
 
     /**
      * @brief Set the value of the vector uniform
+     * @param shader The uniform's shader
      * @param value The value to set the uniform to
     **/
-    void setValue(const glm::vec3& value) {
+    void setValue(Shader const& shader, glm::vec3 const& value) {
         glProgramUniform3fv(shader.id(), location, 1, value_ptr(value));
     }
 
     /**
      * @brief Set the value of the vector uniform
+     * @param shader The uniform's shader
      * @param value The value to set the uniform to
     **/
-    void setValue(const glm::vec4& value) {
+    void setValue(Shader const& shader, glm::vec4 const& value) {
         glProgramUniform4fv(shader.id(), location, 1, value_ptr(value));
     }
 
     /**
      * @brief Set the value of the vector uniform
+     * @param shader The uniform's shader
      * @param value The value to set the uniform to
     **/
-    void setValue(float value) {
+    void setValue(Shader const& shader, float value) {
         glProgramUniform1f(shader.id(), location, value);
     }
 
@@ -171,11 +147,9 @@ public:
     }
 
 private:
-
-    const Shader& shader;
     GLint location;
-
 };
 
+}
 
 #endif

@@ -2,7 +2,6 @@
 
 #include <stdexcept>
 #include <GLFW/glfw3.h>
-#include <glad/glad.h>
 
 using namespace std;
 
@@ -18,7 +17,7 @@ Window::Window(int width, int height, const char* title, bool vsync) :
 
     // Create window
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+    glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
     window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (window == nullptr) throw runtime_error("glfwCreateWindow error");
     glfwMakeContextCurrent(window);

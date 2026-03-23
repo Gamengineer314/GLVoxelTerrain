@@ -5,7 +5,6 @@
 
 
 class FPSCounter : private TerminalRenderer::Component {
-
 public:
     /**
      * @brief Create a new FPS counter
@@ -22,7 +21,6 @@ public:
 private:
     float time;
     int frames;
-
 };
 
 

@@ -6,7 +6,6 @@
 
 
 class Camera {
-
 public:
     int width;
     int height;
@@ -60,7 +59,6 @@ public:
      * @param yRotation Rotation around the y axis (in radians)
     **/
     void rotate(float xRotation, float yRotation);
-
 };
 
 

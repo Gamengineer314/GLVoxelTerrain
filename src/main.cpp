@@ -8,9 +8,7 @@
 #include <glm/gtx/string_cast.hpp>
 
 #include "GLObjects/Window.hpp"
-#include "GLObjects/Command.hpp"
-#include "GLObjects/Buffer.hpp"
-#include "GLObjects/VertexArray.hpp"
+#include "GLObjects/OpenGL.hpp"
 #include "Camera.hpp"
 #include "CameraController.hpp"
 #include "VoxelMesh.hpp"
@@ -46,7 +44,7 @@ int main() {
     
     // Initialize objects
     Window window(windowWidth, windowHeight, title);
-    commandInit(windowWidth, windowHeight);
+    gl::init(windowWidth, windowHeight);
     Camera camera(windowWidth, windowHeight, 60, 0.1, 9999, vec3(0, 400, 0), pi<float>() / 6, pi<float>() / 4);
     CameraController controller(window, camera, windowWidth, windowHeight);
     TerrainRenderer renderer(camera);
@@ -65,7 +63,7 @@ int main() {
 
         // Update
         controller.update(deltaTime);
-        commandBackground(backgroundRed, backgroundGreen, backgroundBlue);
+        gl::setBackground(backgroundRed, backgroundGreen, backgroundBlue);
         renderer.render();
         fpsCounter.update(deltaTime);
         terminal.render();

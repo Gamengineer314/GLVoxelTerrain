@@ -6,10 +6,9 @@
 
 
 class Window {
-
 public:
-    int width;
-    int height;
+    int const width;
+    int const height;
 
     /**
      * @brief Create a GLFW window
@@ -18,12 +17,12 @@ public:
      * @param title Window title
      * @param vsync Enable VSync
     **/
-    Window(int width, int height, const char* title, bool vsync = false);
+    Window(int width, int height, char const* title, bool vsync = false);
 
     ~Window();
 
     Window(Window&& other) = delete;
-    Window(const Window&) = delete;
+    Window(Window const&) = delete;
 
     /**
      * @brief Window update (must be called each frame)
@@ -100,7 +99,6 @@ private:
     double cursorDx = 0;
     double cursorDy = 0;
     bool locked = false;
-
 };
 
 

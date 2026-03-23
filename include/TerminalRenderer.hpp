@@ -7,10 +7,8 @@
 
 
 class TerminalRenderer {
-
 public:
     class Component {
-
     public:
         /**
          * @brief Create a new component
@@ -29,7 +27,6 @@ public:
         TerminalRenderer& renderer;
         int lineStart;
         int lineSize;
-
     };
 
     /**
@@ -62,7 +59,6 @@ private:
      * @param lineSize Number of lines of the component
     **/
     void updateComponent(const std::string* componentLines, int lineStart, int lineSize);
-
 };
 
 

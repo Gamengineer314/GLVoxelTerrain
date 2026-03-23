@@ -3,21 +3,21 @@
 #include <cstdlib>
 #include <vector>
 
-#include "GLObjects/Command.hpp"
-#include "GLObjects/Shader.hpp"
+#include "GLObjects/OpenGL.hpp"
 #include "Camera.hpp"
 #include "VoxelMesh.hpp"
 
-using namespace std;
+using namespace gl;
 using namespace glm;
+using namespace std;
 
 
 static constexpr int threadGroupSize = 64; // Number of threads in a work group for the compute shader
 static constexpr float quadsInterleaving = 0.05f; // Remove small (1 pixel) gaps between triangles
 
 
-TerrainRenderer::TerrainRenderer(Camera& camera)
-  : camera(camera),
+TerrainRenderer::TerrainRenderer(Camera& camera) :
+    camera(camera),
     shader("shaders/vertex.glsl", "shaders/fragment.glsl"),
     graphicsPositionUniform(shader, "position"),
     vpMatrixUniform(shader, "vpMatrix"),
@@ -28,11 +28,14 @@ TerrainRenderer::TerrainRenderer(Camera& camera)
     rightPlaneUniform(frustumCulling, "rightPlane"),
     upPlaneUniform(frustumCulling, "upPlane"),
     downPlaneUniform(frustumCulling, "downPlane") {
-    Uniform(shader, "seed").setValue(rand() / (float)RAND_MAX);
-    Uniform(shader, "quadsInterleaving").setValue(quadsInterleaving);
-    frustumCulling.setBuffer(0, ShaderBufferType::storage, meshDataBuffer);
-    frustumCulling.setBuffer(1, ShaderBufferType::storage, commandsBuffer);
-    frustumCulling.setBuffer(0, ShaderBufferType::counters, paramsBuffer);
+    Uniform(shader, "seed").setValue(shader, rand() / (float)RAND_MAX);
+    Uniform(shader, "quadsInterleaving").setValue(shader, quadsInterleaving);
+    vertexArray.use();
+    commandsBuffer.use(BufferType::indirectDraw);
+    paramsBuffer.use(BufferType::parameters);
+    meshDataBuffer.use(ShaderBufferType::storage, 0);
+    commandsBuffer.use(ShaderBufferType::storage, 1);
+    paramsBuffer.use(ShaderBufferType::counters, 0);
 }
 
 
@@ -69,18 +72,20 @@ void TerrainRenderer::prepareRender() {
 
 void TerrainRenderer::render() {
     // Frustum culling
-    frustumPositionUniform.setValue(camera.position);
-    farPlaneUniform.setValue(camera.farPlane);
-    leftPlaneUniform.setValue(camera.leftPlane);
-    rightPlaneUniform.setValue(camera.rightPlane);
-    upPlaneUniform.setValue(camera.upPlane);
-    downPlaneUniform.setValue(camera.downPlane);
+    frustumPositionUniform.setValue(frustumCulling, camera.position);
+    farPlaneUniform.setValue(frustumCulling, camera.farPlane);
+    leftPlaneUniform.setValue(frustumCulling, camera.leftPlane);
+    rightPlaneUniform.setValue(frustumCulling, camera.rightPlane);
+    upPlaneUniform.setValue(frustumCulling, camera.upPlane);
+    downPlaneUniform.setValue(frustumCulling, camera.downPlane);
     paramsBuffer.clearData(sizeof(uint32_t));
-    commandCompute(frustumCulling, workGroups);
-    commandBarrier(MemoryBarrier::indirectCommand);
+    frustumCulling.use();
+    compute(workGroups);
+    barrier(MemoryBarrier::indirectCommand);
 
     // Draw
-    graphicsPositionUniform.setValue(camera.position);
-    vpMatrixUniform.setValue(camera.vpMatrix);
-    commandDrawIndirect(GeometryMode::triangleStrip, shader, vertexArray, commandsBuffer, paramsBuffer, meshData.size());
+    graphicsPositionUniform.setValue(shader, camera.position);
+    vpMatrixUniform.setValue(shader, camera.vpMatrix);
+    shader.use();
+    drawIndirectParam(GeometryMode::triangleStrip, meshData.size());
 }

@@ -3,15 +3,12 @@
 
 #include <vector>
 
-#include "GLObjects/Buffer.hpp"
-#include "GLObjects/VertexArray.hpp"
-#include "GLObjects/Shader.hpp"
+#include "GLObjects/OpenGL.hpp"
 #include "Camera.hpp"
 #include "VoxelMesh.hpp"
 
 
 class TerrainRenderer {
-
 public:
     /**
      * @brief Create a new voxel terrain renderer
@@ -40,26 +37,25 @@ public:
 
 private:
     Camera& camera;
-    GraphicsShader shader;
+    gl::GraphicsShader shader;
     std::vector<MeshData> meshData; // All meshes information (position, size, rectangles indices)
     std::vector<Square> squares; // All rectangles (position, width, height, normal)
-    Buffer squaresBuffer;
-    Buffer commandsBuffer;
-    VertexArray vertexArray;
-    Uniform graphicsPositionUniform;
-    Uniform vpMatrixUniform;
+    gl::Buffer squaresBuffer;
+    gl::Buffer commandsBuffer;
+    gl::VertexArray vertexArray;
+    gl::Uniform graphicsPositionUniform;
+    gl::Uniform vpMatrixUniform;
 
-    ComputeShader frustumCulling;
-    Buffer meshDataBuffer;
-    Buffer paramsBuffer;
-    Uniform frustumPositionUniform;
-    Uniform farPlaneUniform;
-    Uniform leftPlaneUniform;
-    Uniform rightPlaneUniform;
-    Uniform upPlaneUniform;
-    Uniform downPlaneUniform;
-    GLuint workGroups;
-
+    gl::ComputeShader frustumCulling;
+    gl::Buffer meshDataBuffer;
+    gl::Buffer paramsBuffer;
+    gl::Uniform frustumPositionUniform;
+    gl::Uniform farPlaneUniform;
+    gl::Uniform leftPlaneUniform;
+    gl::Uniform rightPlaneUniform;
+    gl::Uniform upPlaneUniform;
+    gl::Uniform downPlaneUniform;
+    uint32_t workGroups;
 };
 
 
