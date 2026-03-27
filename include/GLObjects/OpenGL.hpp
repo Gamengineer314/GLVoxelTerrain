@@ -7,6 +7,7 @@
 #include "GLObjects/Buffer.hpp"
 #include "GLObjects/VertexArray.hpp"
 #include "GLObjects/Shader.hpp"
+#include "GLObjects/Uniform.hpp"
 
 namespace gl {
 

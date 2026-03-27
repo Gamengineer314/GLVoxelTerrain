@@ -75,7 +75,7 @@ public:
      * @param instances 0 for a vertex buffer, 1 for an instance buffer, > 1 to specify the number of instances that share the same attribute
     **/
     void setBuffer(uint32_t index, Buffer const& buffer, uint32_t stride, uint32_t start = 0, uint32_t instances = 0) const {
-        glVertexArrayVertexBuffer(array, index, buffer.id(), start * stride, stride);
+        glVertexArrayVertexBuffer(array, index, buffer.buffer, start * stride, stride);
         if (instances > 0) glVertexArrayBindingDivisor(array, index, instances);
     }
 
@@ -151,7 +151,7 @@ public:
      * @param indexType Data type of the indices
     **/
     void setIndices(Buffer const& buffer) {
-        glVertexArrayElementBuffer(array, buffer.id());
+        glVertexArrayElementBuffer(array, buffer.buffer);
     }
 
     /**
@@ -166,13 +166,6 @@ public:
     **/
     void use() const {
         glBindVertexArray(array);
-    }
-
-    /**
-     * @brief Get the OpenGL buffer object
-    **/
-    uint32_t id() const {
-        return array;
     }
 
 private:

@@ -59,6 +59,8 @@ enum class ShaderBufferType : GLenum {
 
 
 class Buffer {
+    friend class VertexArray;
+
 public:
     Buffer() {
         glCreateBuffers(1, &buffer);
@@ -82,30 +84,30 @@ public:
     /**
      * @brief Set the data of the buffer. No more calls to setDataUnique() can then be made.
      * @param data Data to store in the buffer
-     * @param n Number of elements to get
+     * @param n Number of elements to set
      * @param usage Usage of the buffer
     **/
-    template<typename T> void setData(T* data, uint32_t n, BufferUsage usage) const {
+    template<typename T> void setData(T const* data, uint32_t n, BufferUsage usage) const {
         glNamedBufferData(buffer, n * sizeof(T), data, (GLenum)usage);
     }
 
     /**
      * @brief Set the data of the buffer. No more calls to setData() or setDataUnique() can then be made.
      * @param data Data to store in the buffer
-     * @param n Number of elements to get
+     * @param n Number of elements to set
      * @param usage Usage of the buffer
     **/
-    template<typename T> void setDataUnique(T* data, uint32_t n, UniqueBufferUsage usage) const {
+    template<typename T> void setDataUnique(T const* data, uint32_t n, UniqueBufferUsage usage) const {
         glNamedBufferStorage(buffer, n * sizeof(T), data, (GLenum)usage);
     }
 
     /**
      * @brief Modify a part of the buffer without resizing it
      * @param data New data to store in the buffer
-     * @param n Number of elements to get
+     * @param n Number of elements to modify
      * @param start First element to get
     **/
-    template<typename T> void modifyData(T* data, uint32_t n, uint32_t start = 0) const {
+    template<typename T> void modifyData(T const* data, uint32_t n, uint32_t start = 0) const {
         glNamedBufferSubData(buffer, start * sizeof(T), n * sizeof(T), data);
     }
 
@@ -152,13 +154,6 @@ public:
     **/
     void use(ShaderBufferType type, uint32_t index) const {
         glBindBufferBase((GLenum)type, index, buffer);
-    }
-
-    /**
-     * @brief Get the OpenGL buffer object
-    **/
-    uint32_t id() const {
-        return buffer;
     }
 
 private:
